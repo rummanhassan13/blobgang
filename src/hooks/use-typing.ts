@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import type { BlobAnimation } from "@/lib/blobs";
 
 /** Shared typing engine for multiplayer and solo races. */
-export function useTypingEngine(text: string, canType: boolean, startLocalMs: number | null) {
+export function useTypingEngine(text: string, canType: boolean, startLocalMs: number | null, resetKey?: string) {
   const [index, setIndex] = useState(0);
   const [hasError, setHasError] = useState(false);
   const [errors, setErrors] = useState(0);
@@ -15,7 +15,7 @@ export function useTypingEngine(text: string, canType: boolean, startLocalMs: nu
   useEffect(() => {
     setIndex(0); setHasError(false); setErrors(0); timeline.current = [];
     st.current = { index: 0, hasError: false, errors: 0 };
-  }, [text]);
+  }, [text, resetKey]);
 
   const bump = (anim: BlobAnimation) => { pulseN.current += 1; setPulse({ anim, n: pulseN.current }); };
 

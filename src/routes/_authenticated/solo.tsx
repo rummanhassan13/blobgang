@@ -5,8 +5,7 @@ import { toast } from "sonner";
 import { Blob } from "@/components/blob/Blob";
 import { BlobState } from "@/components/BlobState";
 import { Countdown } from "@/components/race/Countdown";
-import { Lanes } from "@/components/race/Lanes";
-import { Splash } from "@/components/race/Lanes";
+import { Lanes, Splash } from "@/components/race/Lanes";
 import { Stats } from "@/components/race/Stats";
 import { TypingCard } from "@/components/race/TypingCard";
 import { Button } from "@/components/ui/button";
@@ -64,7 +63,7 @@ function Solo() {
   const startsAt = session ? Date.parse(session.startsAt) : null;
   const serverNow = now + offset;
   const started = startsAt !== null && serverNow >= startsAt;
-  const engine = useTypingEngine(text, started && !result, startsAt !== null ? startsAt - offset : null);
+  const engine = useTypingEngine(text, started && !result, startsAt !== null ? startsAt - offset : null, session?.soloId);
   const done = text.length > 0 && engine.index >= text.length;
   const canType = started && !done && !result;
   const blob = profile && isBlobType(profile.blob) ? profile.blob : "bubbles";

@@ -15,6 +15,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedHomeRouteImport } from './routes/_authenticated/home'
 import { Route as AuthenticatedLeaderboardRouteImport } from './routes/_authenticated/leaderboard'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
+import { Route as AuthenticatedSoloRouteImport } from './routes/_authenticated/solo'
 import { Route as AuthenticatedRaceRoomIdRouteImport } from './routes/_authenticated/race.$roomId'
 import { Route as AuthenticatedResultsRoomIdRouteImport } from './routes/_authenticated/results.$roomId'
 import { Route as AuthenticatedRoomCodeRouteImport } from './routes/_authenticated/room.$code'
@@ -49,6 +50,11 @@ const AuthenticatedProfileRoute = AuthenticatedProfileRouteImport.update({
   path: '/profile',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedSoloRoute = AuthenticatedSoloRouteImport.update({
+  id: '/solo',
+  path: '/solo',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedRaceRoomIdRoute = AuthenticatedRaceRoomIdRouteImport.update({
   id: '/race/$roomId',
   path: '/race/$roomId',
@@ -72,6 +78,7 @@ export interface FileRoutesByFullPath {
   '/home': typeof AuthenticatedHomeRoute
   '/leaderboard': typeof AuthenticatedLeaderboardRoute
   '/profile': typeof AuthenticatedProfileRoute
+  '/solo': typeof AuthenticatedSoloRoute
   '/race/$roomId': typeof AuthenticatedRaceRoomIdRoute
   '/results/$roomId': typeof AuthenticatedResultsRoomIdRoute
   '/room/$code': typeof AuthenticatedRoomCodeRoute
@@ -82,6 +89,7 @@ export interface FileRoutesByTo {
   '/home': typeof AuthenticatedHomeRoute
   '/leaderboard': typeof AuthenticatedLeaderboardRoute
   '/profile': typeof AuthenticatedProfileRoute
+  '/solo': typeof AuthenticatedSoloRoute
   '/race/$roomId': typeof AuthenticatedRaceRoomIdRoute
   '/results/$roomId': typeof AuthenticatedResultsRoomIdRoute
   '/room/$code': typeof AuthenticatedRoomCodeRoute
@@ -94,6 +102,7 @@ export interface FileRoutesById {
   '/_authenticated/home': typeof AuthenticatedHomeRoute
   '/_authenticated/leaderboard': typeof AuthenticatedLeaderboardRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
+  '/_authenticated/solo': typeof AuthenticatedSoloRoute
   '/_authenticated/race/$roomId': typeof AuthenticatedRaceRoomIdRoute
   '/_authenticated/results/$roomId': typeof AuthenticatedResultsRoomIdRoute
   '/_authenticated/room/$code': typeof AuthenticatedRoomCodeRoute
@@ -106,6 +115,7 @@ export interface FileRouteTypes {
     | '/home'
     | '/leaderboard'
     | '/profile'
+    | '/solo'
     | '/race/$roomId'
     | '/results/$roomId'
     | '/room/$code'
@@ -116,6 +126,7 @@ export interface FileRouteTypes {
     | '/home'
     | '/leaderboard'
     | '/profile'
+    | '/solo'
     | '/race/$roomId'
     | '/results/$roomId'
     | '/room/$code'
@@ -127,6 +138,7 @@ export interface FileRouteTypes {
     | '/_authenticated/home'
     | '/_authenticated/leaderboard'
     | '/_authenticated/profile'
+    | '/_authenticated/solo'
     | '/_authenticated/race/$roomId'
     | '/_authenticated/results/$roomId'
     | '/_authenticated/room/$code'
@@ -182,6 +194,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedProfileRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/solo': {
+      id: '/_authenticated/solo'
+      path: '/solo'
+      fullPath: '/solo'
+      preLoaderRoute: typeof AuthenticatedSoloRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/race/$roomId': {
       id: '/_authenticated/race/$roomId'
       path: '/race/$roomId'
@@ -210,6 +229,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedHomeRoute: typeof AuthenticatedHomeRoute
   AuthenticatedLeaderboardRoute: typeof AuthenticatedLeaderboardRoute
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
+  AuthenticatedSoloRoute: typeof AuthenticatedSoloRoute
   AuthenticatedRaceRoomIdRoute: typeof AuthenticatedRaceRoomIdRoute
   AuthenticatedResultsRoomIdRoute: typeof AuthenticatedResultsRoomIdRoute
   AuthenticatedRoomCodeRoute: typeof AuthenticatedRoomCodeRoute
@@ -219,6 +239,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedHomeRoute: AuthenticatedHomeRoute,
   AuthenticatedLeaderboardRoute: AuthenticatedLeaderboardRoute,
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
+  AuthenticatedSoloRoute: AuthenticatedSoloRoute,
   AuthenticatedRaceRoomIdRoute: AuthenticatedRaceRoomIdRoute,
   AuthenticatedResultsRoomIdRoute: AuthenticatedResultsRoomIdRoute,
   AuthenticatedRoomCodeRoute: AuthenticatedRoomCodeRoute,
