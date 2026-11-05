@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { toast } from "sonner";
 import { Blob } from "@/components/blob/Blob";
 import { Button } from "@/components/ui/button";
+import { BlobState } from "@/components/BlobState";
 import { useUser } from "@/hooks/use-auth";
 import { useRoomData, useRoomLive } from "@/hooks/use-room";
 import { supabase } from "@/integrations/supabase/client";
@@ -85,20 +86,20 @@ function Lobby() {
   }
 
   return (
-    <main className="mx-auto w-full max-w-4xl px-4 py-8 sm:px-6">
-      <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
-        <div>
+    <main className="mx-auto w-full max-w-4xl px-3 py-6 sm:px-6 sm:py-8">
+      <div className="mb-6 grid grid-cols-[minmax(0,1fr)_auto] items-end gap-3 sm:flex sm:justify-between">
+        <div className="min-w-0">
           <p className="text-sm font-semibold text-muted-foreground">Room code</p>
-          <h1 className="font-display text-5xl font-bold tracking-[0.2em]">{code}</h1>
+          <h1 className="font-display text-4xl font-bold tracking-[0.15em] sm:text-5xl sm:tracking-[0.2em]">{code}</h1>
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-col gap-2 sm:flex-row">
           <Button variant="soft" onClick={copyLink}>Copy link</Button>
           <Button variant="ghost" onClick={leave}>Leave</Button>
         </div>
       </div>
 
       <div className="glass rounded-[2rem] p-4 sm:p-6">
-        {players.length === 0 && <p className="py-10 text-center text-muted-foreground">Joining…</p>}
+        {players.length === 0 && <BlobState kind="loading" title="Squishing into the room…" />}
         <div className="divide-y divide-dashed divide-border">
           {players.map((p, i) => {
             const connected = p.connected && (online.has(p.user_id) || p.user_id === user?.id);
@@ -126,7 +127,7 @@ function Lobby() {
 
       <div className="mt-8 flex justify-center">
         {isHost ? (
-          <Button variant="jelly" size="lg" className="h-16 px-14 text-lg" onClick={start}>Start race</Button>
+          <Button variant="jelly" size="lg" className="h-16 w-full px-14 text-lg sm:w-auto" onClick={start}>Start race</Button>
         ) : (
           <p className="text-muted-foreground">Waiting for the host to start…</p>
         )}
