@@ -7,6 +7,8 @@ import { Countdown } from "@/components/race/Countdown";
 import { Lanes, type LaneRacer } from "@/components/race/Lanes";
 import { TypingCard } from "@/components/race/TypingCard";
 import { RaceStage } from "@/components/race/RaceStage";
+import { NarratorControl } from "@/components/race/NarratorControl";
+import { useNarrator } from "@/hooks/use-narrator";
 import { Stats } from "@/components/race/Stats";
 import { Button } from "@/components/ui/button";
 import { useUser } from "@/hooks/use-auth";
@@ -44,6 +46,7 @@ function Race() {
   const { index, errors } = engine;
   const done = index >= text.length && text.length > 0;
   const canType = baseCanType && !done;
+  useNarrator(text, index, canType, me?.blob ?? "bubbles");
   const [submitted, setSubmitted] = useState(false);
 
   const countdown = startsAt === null ? null
@@ -164,6 +167,7 @@ function Race() {
         <TypingCard text={text} index={alreadyFinished ? text.length : index} hasError={engine.hasError} errorTick={engine.errorTick}
           disabled={!canType} onChar={engine.onChar} onBackspace={engine.onBackspace} fill={pinned} />
         <Stats wpm={wpm} accuracy={accuracy} waiting={done || alreadyFinished} />
+        <NarratorControl />
       </>
     )}</RaceStage>
   );
