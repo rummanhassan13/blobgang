@@ -36,6 +36,13 @@
       "when": 1793898033017,
       "tag": "0004_server_time_search_path",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1793899206813,
+      "tag": "0005_join_room_finished_message",
+      "breakpoints": true
     }
   ]
 }
