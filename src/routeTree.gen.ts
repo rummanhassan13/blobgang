@@ -10,33 +10,132 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
+import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AuthenticatedHomeRouteImport } from './routes/_authenticated/home'
+import { Route as AuthenticatedLeaderboardRouteImport } from './routes/_authenticated/leaderboard'
+import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
+import { Route as AuthenticatedLobbyCodeRouteImport } from './routes/_authenticated/lobby.$code'
+import { Route as AuthenticatedRaceRoomIdRouteImport } from './routes/_authenticated/race.$roomId'
+import { Route as AuthenticatedResultsRoomIdRouteImport } from './routes/_authenticated/results.$roomId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
+  id: '/_authenticated',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedHomeRoute = AuthenticatedHomeRouteImport.update({
+  id: '/home',
+  path: '/home',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedLeaderboardRoute =
+  AuthenticatedLeaderboardRouteImport.update({
+    id: '/leaderboard',
+    path: '/leaderboard',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedProfileRoute = AuthenticatedProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedLobbyCodeRoute = AuthenticatedLobbyCodeRouteImport.update({
+  id: '/lobby/$code',
+  path: '/lobby/$code',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedRaceRoomIdRoute = AuthenticatedRaceRoomIdRouteImport.update({
+  id: '/race/$roomId',
+  path: '/race/$roomId',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedResultsRoomIdRoute =
+  AuthenticatedResultsRoomIdRouteImport.update({
+    id: '/results/$roomId',
+    path: '/results/$roomId',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
+  '/home': typeof AuthenticatedHomeRoute
+  '/leaderboard': typeof AuthenticatedLeaderboardRoute
+  '/profile': typeof AuthenticatedProfileRoute
+  '/lobby/$code': typeof AuthenticatedLobbyCodeRoute
+  '/race/$roomId': typeof AuthenticatedRaceRoomIdRoute
+  '/results/$roomId': typeof AuthenticatedResultsRoomIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
+  '/home': typeof AuthenticatedHomeRoute
+  '/leaderboard': typeof AuthenticatedLeaderboardRoute
+  '/profile': typeof AuthenticatedProfileRoute
+  '/lobby/$code': typeof AuthenticatedLobbyCodeRoute
+  '/race/$roomId': typeof AuthenticatedRaceRoomIdRoute
+  '/results/$roomId': typeof AuthenticatedResultsRoomIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
+  '/auth': typeof AuthRoute
+  '/_authenticated/home': typeof AuthenticatedHomeRoute
+  '/_authenticated/leaderboard': typeof AuthenticatedLeaderboardRoute
+  '/_authenticated/profile': typeof AuthenticatedProfileRoute
+  '/_authenticated/lobby/$code': typeof AuthenticatedLobbyCodeRoute
+  '/_authenticated/race/$roomId': typeof AuthenticatedRaceRoomIdRoute
+  '/_authenticated/results/$roomId': typeof AuthenticatedResultsRoomIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/auth'
+    | '/home'
+    | '/leaderboard'
+    | '/profile'
+    | '/lobby/$code'
+    | '/race/$roomId'
+    | '/results/$roomId'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/auth'
+    | '/home'
+    | '/leaderboard'
+    | '/profile'
+    | '/lobby/$code'
+    | '/race/$roomId'
+    | '/results/$roomId'
+  id:
+    | '__root__'
+    | '/'
+    | '/_authenticated'
+    | '/auth'
+    | '/_authenticated/home'
+    | '/_authenticated/leaderboard'
+    | '/_authenticated/profile'
+    | '/_authenticated/lobby/$code'
+    | '/_authenticated/race/$roomId'
+    | '/_authenticated/results/$roomId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
+  AuthRoute: typeof AuthRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +147,90 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/home': {
+      id: '/_authenticated/home'
+      path: '/home'
+      fullPath: '/home'
+      preLoaderRoute: typeof AuthenticatedHomeRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/leaderboard': {
+      id: '/_authenticated/leaderboard'
+      path: '/leaderboard'
+      fullPath: '/leaderboard'
+      preLoaderRoute: typeof AuthenticatedLeaderboardRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/profile': {
+      id: '/_authenticated/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof AuthenticatedProfileRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/lobby/$code': {
+      id: '/_authenticated/lobby/$code'
+      path: '/lobby/$code'
+      fullPath: '/lobby/$code'
+      preLoaderRoute: typeof AuthenticatedLobbyCodeRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/race/$roomId': {
+      id: '/_authenticated/race/$roomId'
+      path: '/race/$roomId'
+      fullPath: '/race/$roomId'
+      preLoaderRoute: typeof AuthenticatedRaceRoomIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/results/$roomId': {
+      id: '/_authenticated/results/$roomId'
+      path: '/results/$roomId'
+      fullPath: '/results/$roomId'
+      preLoaderRoute: typeof AuthenticatedResultsRoomIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
   }
 }
 
+interface AuthenticatedRouteRouteChildren {
+  AuthenticatedHomeRoute: typeof AuthenticatedHomeRoute
+  AuthenticatedLeaderboardRoute: typeof AuthenticatedLeaderboardRoute
+  AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
+  AuthenticatedLobbyCodeRoute: typeof AuthenticatedLobbyCodeRoute
+  AuthenticatedRaceRoomIdRoute: typeof AuthenticatedRaceRoomIdRoute
+  AuthenticatedResultsRoomIdRoute: typeof AuthenticatedResultsRoomIdRoute
+}
+
+const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedHomeRoute: AuthenticatedHomeRoute,
+  AuthenticatedLeaderboardRoute: AuthenticatedLeaderboardRoute,
+  AuthenticatedProfileRoute: AuthenticatedProfileRoute,
+  AuthenticatedLobbyCodeRoute: AuthenticatedLobbyCodeRoute,
+  AuthenticatedRaceRoomIdRoute: AuthenticatedRaceRoomIdRoute,
+  AuthenticatedResultsRoomIdRoute: AuthenticatedResultsRoomIdRoute,
+}
+
+const AuthenticatedRouteRouteWithChildren =
+  AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
+  AuthRoute: AuthRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

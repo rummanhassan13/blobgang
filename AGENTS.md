@@ -28,3 +28,8 @@ use the editor.
   own key and store it in Secrets.
 - **Secrets.** Lovable manages them. Do not put secret values in the repo.
 <!-- LOVABLE:END -->
+
+## Project rules
+- Blob characters are a single SVG component (`src/components/blob/Blob.tsx`) driven by `type`/`mood`/`animation` props; colours come from `--blob-*` tokens so palette changes stay in CSS.
+- Signed-in pages live under `src/routes/_authenticated/` (client-only gate); landing and auth stay public.
+- Profiles are created by an `auth.users` trigger from signup metadata (username, blob); usernames are unique case-insensitively and pre-checked via the `username_available` RPC.
