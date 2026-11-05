@@ -103,7 +103,7 @@ function Race() {
       .order("char_index", { ascending: false }).order("errors", { ascending: false }).limit(1).maybeSingle()
       .then(({ data: cp }) => {
         if (cancelled) return;
-        if (cp && cp.char_index < text.length) { restore(cp.char_index, cp.errors); lastCp.current = cp.char_index; }
+        if (cp && cp.char_index <= text.length) { restore(cp.char_index, cp.errors); lastCp.current = cp.char_index; }
         setRestored(true);
       });
     return () => { cancelled = true; };
