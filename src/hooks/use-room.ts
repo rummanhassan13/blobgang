@@ -66,7 +66,7 @@ export function useRoomLive(roomId: string | undefined, userId: string | undefin
 
     const live = supabase.channel(`room-live-${roomId}`, { config: { presence: { key: userId }, broadcast: { self: false } } });
     live
-      .on("presence", { event: "sync" }, () => setOnline(new Set(Object.keys(live.presenceState()))))
+      .on("presence", { event: "sync" }, () => console.log("[sync]", userId?.slice(0,4), Object.keys(live.presenceState())) || setOnline(new Set(Object.keys(live.presenceState()))))
       .on("presence", { event: "leave" }, ({ key }) => {
         if (key && key !== userId) supabase.rpc("set_player_connected", { _room_id: roomId, _user_id: key, _connected: false });
       })
@@ -74,7 +74,8 @@ export function useRoomLive(roomId: string | undefined, userId: string | undefin
         const p = payload as ProgressMsg;
         setProgress((prev) => ({ ...prev, [p.userId]: p }));
       })
-      .subscribe(async (status) => {
+      .subscribe(async (status, err) => {
+        console.log("[live]", userId?.slice(0,4), status, err?.message);
         if (status === "SUBSCRIBED") {
           subscribed.current = true;
           await live.track({ at: Date.now() });
