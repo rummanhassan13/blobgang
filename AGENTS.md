@@ -31,7 +31,8 @@ use the editor.
 
 ## Project rules
 - Blob characters are a single SVG component (`src/components/blob/Blob.tsx`) driven by `type`/`mood`/`animation` props; colours come from `--blob-*` tokens so palette changes stay in CSS.
-- Signed-in pages live under `src/routes/_authenticated/` (client-only gate); landing and auth stay public.
+- Signed-in pages live under `src/routes/_authenticated/` with `ssr: "data-only"` so the server still emits each page head (share cards, noindex) while the auth check and page render run in the browser; landing and auth stay public. Per-route head tags come from `seo()` in `src/lib/seo.ts`.
+- Race typing input accepts exactly one character per insertion (beforeinput + composition diffing in `TypingCard`); multi-character inserts are rejected. `RaceStage` pins the race above the phone keyboard via visualViewport.
 - Profiles are created by an `auth.users` trigger from signup metadata (username, blob); usernames are unique case-insensitively and pre-checked via the `username_available` RPC.
 - Race stats are computed by the `submitResult`/`submitSolo` server functions; placement, points, result rows and profile totals are written atomically by service-role-only SQL functions (`record_multi_result` locks the room row; `apply_profile_result` increments in one UPDATE) to avoid races. Placement bonuses only apply when `rooms.starting_players` >= 2 (set by start_race). A trigger forces client-inserted rooms to start as a fresh lobby; clients have no INSERT/UPDATE on room_players/race_results and only `blob` on profiles. Room state changes go through SECURITY DEFINER RPCs (join_room, start_race, advance_room, set_player_connected).
 - Live race progress goes over a Realtime broadcast/presence channel, never DB writes; supabase-js RPC calls must be awaited or `.then()`'d or they never run.
