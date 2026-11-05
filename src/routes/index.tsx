@@ -5,6 +5,7 @@ import { Blob } from "@/components/blob/Blob";
 import { Button } from "@/components/ui/button";
 import { useEffect, useState, type ReactNode } from "react";
 import { sfx, startMusic, stopMusic } from "@/lib/sfx";
+import { Playpen } from "@/components/landing/Playpen";
 import { ScrollBackdrop } from "@/components/landing/ScrollBackdrop";
 import { BLOB_INFO, BLOB_TYPES, type BlobAnimation, type BlobType } from "@/lib/blobs";
 
@@ -38,7 +39,6 @@ export const Route = createFileRoute("/")({
   component: Landing,
 });
 
-const ANIMS: BlobAnimation[] = ["happy", "squash", "jiggle", "idle", "happy", "squash"];
 
 function Reveal({ children, className, delay = 0 }: { children: ReactNode; className?: string; delay?: number }) {
   return (
@@ -104,21 +104,7 @@ function Landing() {
         <Button asChild variant="soft" size="lg"><Link to="/home">I have an account</Link></Button>
       </div>
 
-      {/* Race track */}
-      <div role="img" aria-label="All six blobs racing along their lanes" className="glass relative mt-14 w-full overflow-hidden rounded-[2.5rem] px-4 py-8 sm:px-8">
-        <div className="space-y-2">
-          {BLOB_TYPES.map((t, i) => (
-            <div key={t} className="relative h-16 border-b border-dashed border-border last:border-0">
-              <motion.div className="absolute bottom-1"
-                initial={{ left: "0%" }}
-                animate={{ left: ["0%", "86%"] }}
-                transition={{ duration: 5 + ((i * 1.7) % 4), repeat: Infinity, repeatType: "mirror", ease: "easeInOut", delay: i * 0.25 }}>
-                <button type="button" tabIndex={-1} aria-hidden onClick={sfx.word} className="cursor-pointer"><Blob type={t} size={58} animation={ANIMS[i]} /></button>
-              </motion.div>
-            </div>
-          ))}
-        </div>
-      </div>
+      <Playpen />
 
       <section aria-labelledby="how-heading" className={sectionCls}>
         <Reveal><h2 id="how-heading" className={h2Cls}>How it works</h2></Reveal>
