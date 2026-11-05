@@ -76,12 +76,12 @@ export function useRoomLive(roomId: string | undefined, userId: string | undefin
       .on("presence", { event: "sync" }, () => setOnline(new Set(Object.keys(live.presenceState()))))
       .on("presence", { event: "leave" }, ({ key }) => {
         if (!key || key === userId) return;
-        // Debounce: brief reconnects (navigation between lobby and race) should not mark a drop
+        // Grace period: tab switches / brief reconnects should not mark a drop
         setTimeout(() => {
           if (!(key in live.presenceState())) {
             void supabase.rpc("set_player_connected", { _room_id: roomId, _user_id: key, _connected: false }).then();
           }
-        }, 4000);
+        }, 8000);
       })
       .on("broadcast", { event: "progress" }, ({ payload }) => {
         const p = payload as ProgressMsg;

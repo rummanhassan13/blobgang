@@ -12,6 +12,7 @@ export type LaneRacer = {
   finished: boolean;
   placement?: number | null | undefined;
   isMe?: boolean;
+  ghost?: boolean;
   /** transient animation for own blob, keyed by `pulse` */
   pulse?: { anim: BlobAnimation; n: number } | undefined;
 };
@@ -19,7 +20,7 @@ export type LaneRacer = {
 const WAVE_A = "M0 10 Q 25 4 50 10 T 100 10 T 150 10 T 200 10";
 const WAVE_B = "M0 10 Q 25 16 50 10 T 100 10 T 150 10 T 200 10";
 
-function Splash() {
+export function Splash() {
   return (
     <div className="pointer-events-none absolute inset-0">
       {Array.from({ length: 8 }).map((_, i) => {
@@ -74,8 +75,9 @@ export function Lanes({ racers, size = 52 }: { racers: LaneRacer[]; size?: numbe
                   size={size}
                   animation={anim}
                   mood={!r.connected ? "sleepy" : r.finished ? "happy" : undefined}
+                  ghost={r.ghost}
                 />
-                <AnimatePresence>{r.finished && <Splash key="splash" />}</AnimatePresence>
+                <AnimatePresence>{r.finished && !r.ghost && <Splash key="splash" />}</AnimatePresence>
               </div>
             </motion.div>
             <div className="absolute left-0 top-0 flex items-center gap-1.5 text-xs font-semibold text-muted-foreground">
