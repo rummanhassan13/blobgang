@@ -14,16 +14,236 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      ghost_runs: {
+        Row: {
+          created_at: string
+          passage_id: number
+          timeline: Json
+          user_id: string
+          wpm: number
+        }
+        Insert: {
+          created_at?: string
+          passage_id: number
+          timeline?: Json
+          user_id: string
+          wpm: number
+        }
+        Update: {
+          created_at?: string
+          passage_id?: number
+          timeline?: Json
+          user_id?: string
+          wpm?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ghost_runs_passage_id_fkey"
+            columns: ["passage_id"]
+            isOneToOne: false
+            referencedRelation: "passages"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      passages: {
+        Row: {
+          difficulty: string
+          id: number
+          length: number
+          text: string
+        }
+        Insert: {
+          difficulty?: string
+          id?: number
+          length: number
+          text: string
+        }
+        Update: {
+          difficulty?: string
+          id?: number
+          length?: number
+          text?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          best_wpm: number
+          blob: Database["public"]["Enums"]["blob_type"]
+          created_at: string
+          id: string
+          races_played: number
+          total_points: number
+          username: string
+        }
+        Insert: {
+          best_wpm?: number
+          blob?: Database["public"]["Enums"]["blob_type"]
+          created_at?: string
+          id: string
+          races_played?: number
+          total_points?: number
+          username: string
+        }
+        Update: {
+          best_wpm?: number
+          blob?: Database["public"]["Enums"]["blob_type"]
+          created_at?: string
+          id?: string
+          races_played?: number
+          total_points?: number
+          username?: string
+        }
+        Relationships: []
+      }
+      race_results: {
+        Row: {
+          accuracy: number
+          created_at: string
+          id: string
+          mode: Database["public"]["Enums"]["race_mode"]
+          passage_id: number
+          points: number
+          room_id: string | null
+          user_id: string
+          wpm: number
+        }
+        Insert: {
+          accuracy: number
+          created_at?: string
+          id?: string
+          mode: Database["public"]["Enums"]["race_mode"]
+          passage_id: number
+          points?: number
+          room_id?: string | null
+          user_id: string
+          wpm: number
+        }
+        Update: {
+          accuracy?: number
+          created_at?: string
+          id?: string
+          mode?: Database["public"]["Enums"]["race_mode"]
+          passage_id?: number
+          points?: number
+          room_id?: string | null
+          user_id?: string
+          wpm?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "race_results_passage_id_fkey"
+            columns: ["passage_id"]
+            isOneToOne: false
+            referencedRelation: "passages"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "race_results_room_id_fkey"
+            columns: ["room_id"]
+            isOneToOne: false
+            referencedRelation: "rooms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      room_players: {
+        Row: {
+          accuracy: number
+          blob: Database["public"]["Enums"]["blob_type"]
+          finished_at: string | null
+          joined_at: string
+          placement: number | null
+          progress: number
+          room_id: string
+          user_id: string
+          username: string
+          wpm: number
+        }
+        Insert: {
+          accuracy?: number
+          blob: Database["public"]["Enums"]["blob_type"]
+          finished_at?: string | null
+          joined_at?: string
+          placement?: number | null
+          progress?: number
+          room_id: string
+          user_id: string
+          username: string
+          wpm?: number
+        }
+        Update: {
+          accuracy?: number
+          blob?: Database["public"]["Enums"]["blob_type"]
+          finished_at?: string | null
+          joined_at?: string
+          placement?: number | null
+          progress?: number
+          room_id?: string
+          user_id?: string
+          username?: string
+          wpm?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "room_players_room_id_fkey"
+            columns: ["room_id"]
+            isOneToOne: false
+            referencedRelation: "rooms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      rooms: {
+        Row: {
+          code: string
+          created_at: string
+          host_id: string
+          id: string
+          passage_id: number | null
+          starts_at: string | null
+          status: Database["public"]["Enums"]["room_status"]
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          host_id: string
+          id?: string
+          passage_id?: number | null
+          starts_at?: string | null
+          status?: Database["public"]["Enums"]["room_status"]
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          host_id?: string
+          id?: string
+          passage_id?: number | null
+          starts_at?: string | null
+          status?: Database["public"]["Enums"]["room_status"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rooms_passage_id_fkey"
+            columns: ["passage_id"]
+            isOneToOne: false
+            referencedRelation: "passages"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      username_available: { Args: { _username: string }; Returns: boolean }
     }
     Enums: {
-      [_ in never]: never
+      blob_type: "zippy" | "snooze" | "grumbo" | "bubbles" | "gloop" | "mochi"
+      race_mode: "solo" | "multi"
+      room_status: "lobby" | "countdown" | "racing" | "finished"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +370,10 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      blob_type: ["zippy", "snooze", "grumbo", "bubbles", "gloop", "mochi"],
+      race_mode: ["solo", "multi"],
+      room_status: ["lobby", "countdown", "racing", "finished"],
+    },
   },
 } as const
