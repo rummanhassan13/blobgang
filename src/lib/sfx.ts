@@ -58,7 +58,7 @@ const BASS = [131, 131, 165, 147];
 function musicTick(step: number) {
   const n = MELODY[step % MELODY.length];
   if (n) tone(n, 0.5, { type: "sine", vol: 0.018 });
-  if (step % 4 === 0) tone(BASS[(step / 4) % BASS.length], 1.6, { type: "triangle", vol: 0.022 });
+  if (step % 4 === 0) tone(BASS[(step / 4) % BASS.length] ?? 131, 1.6, { type: "triangle", vol: 0.022 });
 }
 function startLoop() {
   if (musicTimer || muted || !ac()) return;
