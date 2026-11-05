@@ -3,7 +3,8 @@ import { seo, SITE_URL, OG_IMAGE } from "@/lib/seo";
 import { motion } from "framer-motion";
 import { Blob } from "@/components/blob/Blob";
 import { Button } from "@/components/ui/button";
-import { useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
+import { sfx, startMusic, stopMusic } from "@/lib/sfx";
 import { ScrollBackdrop } from "@/components/landing/ScrollBackdrop";
 import { BLOB_INFO, BLOB_TYPES, type BlobAnimation, type BlobType } from "@/lib/blobs";
 
@@ -61,7 +62,7 @@ function GangCard({ t, i }: { t: BlobType; i: number }) {
       <button type="button" aria-label={`${BLOB_INFO[t].name}: ${BLOB_INFO[t].tagline}`}
         onMouseEnter={() => setActive(true)} onMouseLeave={() => setActive(false)}
         onFocus={() => setActive(true)} onBlur={() => setActive(false)}
-        onClick={() => setActive((a) => !a)}
+        onClick={() => { sfx.pop(); setActive((a) => !a); }}
         className="glass flex w-full flex-col items-center rounded-[2rem] p-5 transition-transform duration-300 hover:-translate-y-1 sm:p-6">
         <Blob key={active ? "squash" : "idle"} type={t} size={88} animation={active ? "squash" : "idle"} mood={active ? "happy" : undefined} />
         <h3 className="mt-3 text-lg font-bold sm:text-xl">{BLOB_INFO[t].name}</h3>
@@ -75,6 +76,14 @@ const sectionCls = "mt-24 w-full sm:mt-32";
 const h2Cls = "text-3xl font-bold sm:text-4xl";
 
 function Landing() {
+  // Browsers only allow audio after a tap/click/key, so start the music on the first interaction.
+  useEffect(() => {
+    const go = () => startMusic();
+    const opts = { once: true } as const;
+    window.addEventListener("pointerdown", go, opts);
+    window.addEventListener("keydown", go, opts);
+    return () => { window.removeEventListener("pointerdown", go); window.removeEventListener("keydown", go); stopMusic(); };
+  }, []);
   return (
     <>
     <ScrollBackdrop />
@@ -104,7 +113,7 @@ function Landing() {
                 initial={{ left: "0%" }}
                 animate={{ left: ["0%", "86%"] }}
                 transition={{ duration: 5 + ((i * 1.7) % 4), repeat: Infinity, repeatType: "mirror", ease: "easeInOut", delay: i * 0.25 }}>
-                <Blob type={t} size={58} animation={ANIMS[i]} />
+                <button type="button" tabIndex={-1} aria-hidden onClick={sfx.word} className="cursor-pointer"><Blob type={t} size={58} animation={ANIMS[i]} /></button>
               </motion.div>
             </div>
           ))}
@@ -119,7 +128,7 @@ function Landing() {
             <li key={s.title}>
               <Reveal delay={i * 0.1} className="relative flex items-center gap-4 py-4 sm:gap-6">
                 <div className="relative z-10 flex h-[4.5rem] w-[4.5rem] shrink-0 items-center justify-center rounded-full bg-background">
-                  <Blob type={s.blob} size={60} animation={s.anim} />
+                  <button type="button" tabIndex={-1} aria-hidden onClick={sfx.pop}><Blob type={s.blob} size={60} animation={s.anim} /></button>
                 </div>
                 <span aria-hidden className="w-10 shrink-0 text-center font-display text-5xl font-bold leading-none text-primary/30 sm:w-12 sm:text-6xl">{i + 1}</span>
                 <div className="min-w-0">
