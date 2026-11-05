@@ -48,6 +48,10 @@ export const sfx = {
   go: () => { tone(780, 0.25, { type: "triangle", vol: 0.16 }); tone(1170, 0.3, { vol: 0.08, delay: 0.04 }); },
   finish: () => [523, 659, 784, 1047].forEach((f, i) => tone(f, 0.22, { type: "triangle", vol: 0.13, delay: i * 0.09 })),
   pop: () => tone(300, 0.1, { vol: 0.1, to: 900 }),
+  /** furious squeaky scream */
+  scream: () => { tone(900, 0.35, { type: "sawtooth", vol: 0.05, to: 1500 }); tone(1300, 0.3, { type: "square", vol: 0.025, to: 700, delay: 0.12 }); },
+  /** soft bonk off a wall */
+  bonk: () => tone(240, 0.07, { type: "triangle", vol: 0.05, to: 160 }),
 };
 
 /** Very quiet, gentle looping music made on the fly (soft pentatonic plucks over a pad). */
