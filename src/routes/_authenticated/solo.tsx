@@ -1,3 +1,4 @@
+import { seo } from "@/lib/seo";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
@@ -6,6 +7,7 @@ import { Blob } from "@/components/blob/Blob";
 import { BlobState } from "@/components/BlobState";
 import { Countdown } from "@/components/race/Countdown";
 import { Lanes, Splash } from "@/components/race/Lanes";
+import { RaceStage } from "@/components/race/RaceStage";
 import { Stats } from "@/components/race/Stats";
 import { TypingCard } from "@/components/race/TypingCard";
 import { Button } from "@/components/ui/button";
@@ -19,14 +21,7 @@ import { computeAccuracy, computeWpm } from "@/lib/scoring";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/solo")({
-  head: () => ({
-    meta: [
-      { title: "Solo ghost race · Blob Gang" },
-      { name: "description", content: "Race the ghost of your best run and beat your own record." },
-      { property: "og:title", content: "Solo ghost race · Blob Gang" },
-      { property: "og:description", content: "Race the ghost of your best run and beat your own record." },
-    ],
-  }),
+  head: () => seo({ title: "Solo ghost race · Blob Gang", description: "Race the translucent ghost of your best run and beat your own typing record.", path: "/solo", noindex: true }),
   component: Solo,
 });
 
@@ -157,14 +152,14 @@ function Solo() {
   const beat = diff > 0;
 
   return (
-    <main className="mx-auto w-full max-w-5xl space-y-4 px-3 py-4 sm:space-y-6 sm:px-6 sm:py-6">
+    <RaceStage>{(pinned) => (<>
       <Countdown value={countdown} />
-      <Lanes racers={[
+      <div className="shrink-0"><Lanes compact={pinned} racers={[
         { userId: "me", username: profile?.username ?? "you", blob, isMe: true, connected: true, finished: done,
           progress: text ? engine.index / text.length : 0, pulse: done ? undefined : engine.pulse },
         { userId: "ghost", username: ghostLabel, blob, ghost: true, connected: true, finished: ghostIdx >= text.length,
           progress: text ? ghostIdx / text.length : 0 },
-      ]} />
+      ]} /></div>
       {result || rejected ? (
         <motion.section initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
           className="glass flex flex-col items-center rounded-[2rem] p-6 text-center sm:p-10">
@@ -193,13 +188,13 @@ function Solo() {
       ) : (
         <>
           <TypingCard text={text} index={engine.index} hasError={engine.hasError} errorTick={engine.errorTick}
-            disabled={!canType} onChar={engine.onChar} onBackspace={engine.onBackspace} />
+            disabled={!canType} onChar={engine.onChar} onBackspace={engine.onBackspace} fill={pinned} />
           <Stats wpm={myWpm} accuracy={acc} />
           <p className={cn("text-center text-xs text-muted-foreground", done && "animate-pulse")}>
             {done ? "Checking your run…" : `${session.passage.difficulty} passage`}
           </p>
         </>
       )}
-    </main>
+    </>)}</RaceStage>
   );
 }

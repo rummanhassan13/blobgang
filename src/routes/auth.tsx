@@ -1,3 +1,4 @@
+import { seo } from "@/lib/seo";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
@@ -17,14 +18,7 @@ function safeRedirect(v: unknown): string {
 export const Route = createFileRoute("/auth")({
   validateSearch: (s: Record<string, unknown>): { redirect?: string } =>
     typeof s["redirect"] === "string" ? { redirect: s["redirect"] } : {},
-  head: () => ({
-    meta: [
-      { title: "Sign in · Blob Gang" },
-      { name: "description", content: "Join the Blob Gang: pick your blob and start racing." },
-      { property: "og:title", content: "Sign in · Blob Gang" },
-      { property: "og:description", content: "Join the Blob Gang: pick your blob and start racing." },
-    ],
-  }),
+  head: () => seo({ title: "Sign in or join · Blob Gang", description: "Sign in or pick your blob and join Blob Gang, the squishy multiplayer typing race.", path: "/auth", noindex: true }),
   component: AuthPage,
 });
 
@@ -85,6 +79,7 @@ function AuthPage() {
   return (
     <main className="mx-auto w-full max-w-md px-4 py-8">
       <div className="glass rounded-[2rem] p-6 sm:p-8">
+        <h1 className="sr-only">{mode === "login" ? "Log in to Blob Gang" : "Join Blob Gang"}</h1>
         <div className="mb-6 flex justify-center">
           <Blob key={wrong} type={mode === "signup" ? blob : "grumbo"} size={90}
             animation={wrong > 0 && mode === "login" ? "shake" : "idle"} mood={mode === "login" ? "neutral" : undefined} />
@@ -92,7 +87,7 @@ function AuthPage() {
         <div className="mb-6 grid grid-cols-2 rounded-full bg-secondary p-1">
           {(["login", "signup"] as const).map((m) => (
             <button key={m} type="button" onClick={() => setMode(m)}
-              className="relative rounded-full py-2 font-display text-sm font-semibold">
+              className="relative min-h-11 rounded-full py-2 font-display text-sm font-semibold">
               {mode === m && <motion.span layoutId="authtab" className="absolute inset-0 rounded-full bg-card shadow-soft" transition={{ type: "spring", stiffness: 400, damping: 30 }} />}
               <span className="relative">{m === "login" ? "Log in" : "Sign up"}</span>
             </button>

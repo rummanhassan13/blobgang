@@ -9,6 +9,7 @@ import {
   type ErrorComponentProps,
 } from "@tanstack/react-router";
 import { useEffect, type ReactNode } from "react";
+import { MotionConfig } from "framer-motion";
 import { Toaster } from "@/components/ui/sonner";
 import { BackgroundBlobs } from "@/components/BackgroundBlobs";
 import { AppNav } from "@/components/AppNav";
@@ -84,10 +85,12 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
   head: () => ({
     meta: [
       { charSet: "utf-8" },
-      { name: "viewport", content: "width=device-width, initial-scale=1" },
+      { name: "viewport", content: "width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content" },
       { title: "Blob Gang" },
       { name: "description", content: "Multiplayer typing races with squishy jelly blobs." },
+      { name: "theme-color", content: "#fbf8f2" },
       { property: "og:type", content: "website" },
+      { property: "og:site_name", content: "Blob Gang" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
     links: [
@@ -95,9 +98,13 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         rel: "stylesheet",
         href: appCss,
       },
-      { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
+      { rel: "icon", href: "/favicon.svg", type: "image/svg+xml" },
+      { rel: "icon", href: "/favicon.ico", sizes: "48x48" },
+      { rel: "apple-touch-icon", href: "/apple-touch-icon.png" },
+      { rel: "manifest", href: "/site.webmanifest" },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
+      { rel: "preload", as: "style", href: "https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Fredoka:wght@500;600;700&family=Nunito:wght@400;600;700;800&display=swap" },
       {
         rel: "stylesheet",
         href: "https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Fredoka:wght@500;600;700&family=Nunito:wght@400;600;700;800&display=swap",
@@ -140,11 +147,13 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-      <BackgroundBlobs />
-      <div className="relative flex min-h-screen flex-col">
-        <AppNav />
-        <Outlet />
-      </div>
+      <MotionConfig reducedMotion="user">
+        <BackgroundBlobs />
+        <div className="relative flex min-h-dvh flex-col">
+          <AppNav />
+          <Outlet />
+        </div>
+      </MotionConfig>
       <Toaster position="top-center" />
     </QueryClientProvider>
   );

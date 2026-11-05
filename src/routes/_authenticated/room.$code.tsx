@@ -1,3 +1,4 @@
+import { seo } from "@/lib/seo";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
@@ -12,14 +13,7 @@ import { isBlobType } from "@/lib/blobs";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/room/$code")({
-  head: () => ({
-    meta: [
-      { title: "Lobby · Blob Gang" },
-      { name: "description", content: "Wait for your gang to join before the race starts." },
-      { property: "og:title", content: "Join my Blob Gang race" },
-      { property: "og:description", content: "Wait for your gang to join before the race starts." },
-    ],
-  }),
+  head: ({ params }) => seo({ title: "Join my Blob Gang race", description: "Pick a jelly blob and race me in a squishy multiplayer typing race. Click to join the lobby.", path: `/room/${params.code}`, noindex: true }),
   component: Lobby,
 });
 
