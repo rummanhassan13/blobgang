@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { BlobAnimation } from "@/lib/blobs";
+import { sfx } from "@/lib/sfx";
 
 /** Shared typing engine for multiplayer and solo races. */
 export function useTypingEngine(text: string, canType: boolean, startLocalMs: number | null, resetKey?: string) {
@@ -27,6 +28,7 @@ export function useTypingEngine(text: string, canType: boolean, startLocalMs: nu
       s.index += 1;
       timeline.current[s.index - 1] = startLocalMs ? Math.max(0, Date.now() - startLocalMs) : 0;
       setIndex(s.index);
+      if (s.index === text.length) sfx.finish(); else if (ch === " ") sfx.word(); else sfx.key();
       if (ch === " " || s.index === text.length) bump("jiggle");
     } else {
       s.hasError = true;
@@ -35,6 +37,7 @@ export function useTypingEngine(text: string, canType: boolean, startLocalMs: nu
       setErrors(s.errors);
       setErrorTick((t) => t + 1);
       bump("shake");
+      sfx.typo();
     }
   }, [canType, text, startLocalMs]);
 
