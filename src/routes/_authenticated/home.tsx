@@ -48,15 +48,14 @@ function Home() {
       toast.error("Could not create a room. Try again.");
       return;
     }
-    await supabase.from("room_players").insert({ room_id: room.id, user_id: user.id, blob: profile.blob, username: profile.username });
-    navigate({ to: "/lobby/$code", params: { code: room.code } });
+    navigate({ to: "/room/$code", params: { code: room.code } });
   }
 
   function join(e: React.FormEvent) {
     e.preventDefault();
     const c = code.trim().toUpperCase();
     if (c.length < 4) { toast.error("Enter a room code"); return; }
-    navigate({ to: "/lobby/$code", params: { code: c } });
+    navigate({ to: "/room/$code", params: { code: c } });
   }
 
   const blob = profile && isBlobType(profile.blob) ? profile.blob : "bubbles";
