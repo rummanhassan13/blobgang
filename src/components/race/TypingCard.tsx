@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 
@@ -16,6 +16,7 @@ const block = (e: React.SyntheticEvent) => e.preventDefault();
 
 export function TypingCard({ text, index, hasError, errorTick, disabled, onChar, onBackspace }: Props) {
   const inputRef = useRef<HTMLInputElement>(null);
+  const [focused, setFocused] = useState(false);
 
   useEffect(() => {
     if (!disabled) inputRef.current?.focus();
@@ -36,11 +37,16 @@ export function TypingCard({ text, index, hasError, errorTick, disabled, onChar,
   }, [text]);
 
   return (
-    <div className="glass relative rounded-[2rem] p-6 sm:p-10" onClick={() => inputRef.current?.focus()}>
+    <div className="glass relative rounded-[2rem] p-5 sm:p-10" onClick={() => inputRef.current?.focus()}>
       <input
         ref={inputRef}
         aria-label="Type the passage"
-        className="absolute h-px w-px opacity-0"
+        // Covers the card so a tap opens the mobile keyboard; 16px avoids iOS zoom
+        className="absolute inset-0 z-10 h-full w-full cursor-default rounded-[2rem] text-[16px] opacity-0"
+        inputMode="text"
+        enterKeyHint="next"
+        onFocus={() => setFocused(true)}
+        onBlur={() => setFocused(false)}
         autoComplete="off" autoCorrect="off" autoCapitalize="off" spellCheck={false}
         disabled={disabled}
         value=""
@@ -48,7 +54,7 @@ export function TypingCard({ text, index, hasError, errorTick, disabled, onChar,
         onKeyDown={(e) => { if (e.key === "Backspace") { e.preventDefault(); onBackspace(); } }}
         onPaste={block} onDrop={block} onCut={block} onContextMenu={block} onCopy={block}
       />
-      <p className="select-none font-read text-2xl leading-[1.7] tracking-wide text-foreground sm:text-[1.7rem]">
+      <p className="select-none font-read text-xl leading-[1.7] tracking-wide text-foreground sm:text-[1.7rem]">
         {words.map((w) => (
           <span key={w.start} className="inline-block whitespace-pre">
             {Array.from(w.chars).map((ch, j) => {
@@ -74,6 +80,9 @@ export function TypingCard({ text, index, hasError, errorTick, disabled, onChar,
         ))}
       </p>
       {disabled && index === 0 && <p className="mt-4 text-center text-sm text-muted-foreground">Get ready…</p>}
+      {!disabled && !focused && (
+        <p className="mt-4 text-center text-sm font-semibold text-primary">Tap here (or press any key) to keep typing</p>
+      )}
     </div>
   );
 }
