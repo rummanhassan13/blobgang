@@ -54,7 +54,7 @@ export function TypingCard({ text, index, hasError, errorTick, disabled, onChar,
         onKeyDown={(e) => { if (e.key === "Backspace") { e.preventDefault(); onBackspace(); } }}
         onPaste={block} onDrop={block} onCut={block} onContextMenu={block} onCopy={block}
       />
-      <p className="select-none font-read text-xl leading-[1.7] tracking-wide text-foreground sm:text-[1.7rem]">
+      <p data-index={index} className="select-none font-read text-xl leading-[1.7] tracking-wide text-foreground sm:text-[1.7rem]">
         {words.map((w) => (
           <span key={w.start} className="inline-block whitespace-pre">
             {Array.from(w.chars).map((ch, j) => {
