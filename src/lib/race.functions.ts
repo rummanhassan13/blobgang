@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { checkpointErrors, computeAccuracy, computePoints, computeWpm, validateRun } from "@/lib/scoring";
+import { checkpointErrors, computeAccuracy, computeWpm, validateRun } from "@/lib/scoring";
 
 /**
  * submit-result: the only path that writes race stats. Finish time is the server
@@ -39,30 +39,15 @@ export const submitResult = createServerFn({ method: "POST" })
     const wpm = Math.round(computeWpm(chars, receivedAt - startsAt) * 10) / 10;
     const errors = checkpointErrors(checkpoints ?? []);
     const accuracy = Math.round(computeAccuracy(chars, errors) * 10) / 10;
-    const { count } = await supabaseAdmin
-      .from("room_players").select("*", { count: "exact", head: true })
-      .eq("room_id", room.id).not("finished_at", "is", null);
-    const placement = (count ?? 0) + 1;
-    const points = computePoints(wpm, accuracy, placement);
-
-    const { data: updated } = await supabaseAdmin
-      .from("room_players")
-      .update({ progress: 1, wpm, accuracy, errors, placement, points, finished_at: new Date(receivedAt).toISOString() })
-      .eq("room_id", room.id).eq("user_id", userId).is("finished_at", null)
-      .select().maybeSingle();
-    if (!updated) return { ok: true as const, placement: player.placement, wpm };
-
-    await supabaseAdmin.from("race_results").insert({
-      user_id: userId, room_id: room.id, mode: "multi", passage_id: room.passage_id, wpm, accuracy, points,
+    // Placement, points, result row and profile totals are written atomically under a room lock.
+    const { data: rec, error: recErr } = await supabaseAdmin.rpc("record_multi_result", {
+      _room_id: room.id, _user_id: userId, _wpm: wpm, _accuracy: accuracy, _errors: errors,
+      _finished_at: new Date(receivedAt).toISOString(),
     });
-    const { data: prof } = await supabaseAdmin.from("profiles").select("*").eq("id", userId).single();
-    if (prof) {
-      await supabaseAdmin.from("profiles").update({
-        total_points: prof.total_points + points,
-        best_wpm: Math.max(Number(prof.best_wpm), wpm),
-        races_played: prof.races_played + 1,
-      }).eq("id", userId);
-    }
+    const row = rec?.[0];
+    if (recErr || !row) throw new Error("Could not record result");
+    if (row.already) return { ok: true as const, placement: row.placement, wpm };
+    const { placement, points } = row;
     await supabaseAdmin.rpc("advance_room", { _room_id: room.id });
     return { ok: true as const, placement, wpm, accuracy, points };
   });

@@ -250,6 +250,7 @@ export type Database = {
           id: string
           next_room_code: string | null
           passage_id: number | null
+          starting_players: number | null
           starts_at: string | null
           status: Database["public"]["Enums"]["room_status"]
         }
@@ -260,6 +261,7 @@ export type Database = {
           id?: string
           next_room_code?: string | null
           passage_id?: number | null
+          starting_players?: number | null
           starts_at?: string | null
           status?: Database["public"]["Enums"]["room_status"]
         }
@@ -270,6 +272,7 @@ export type Database = {
           id?: string
           next_room_code?: string | null
           passage_id?: number | null
+          starting_players?: number | null
           starts_at?: string | null
           status?: Database["public"]["Enums"]["room_status"]
         }
@@ -365,6 +368,10 @@ export type Database = {
         Args: { _room_id: string }
         Returns: Database["public"]["Enums"]["room_status"]
       }
+      apply_profile_result: {
+        Args: { _points: number; _user_id: string; _wpm: number }
+        Returns: undefined
+      }
       get_leaderboard: {
         Args: { _limit?: number; _period: string }
         Returns: {
@@ -386,6 +393,7 @@ export type Database = {
           id: string
           next_room_code: string | null
           passage_id: number | null
+          starting_players: number | null
           starts_at: string | null
           status: Database["public"]["Enums"]["room_status"]
         }
@@ -398,6 +406,21 @@ export type Database = {
       }
       leave_room: { Args: { _room_id: string }; Returns: undefined }
       race_again: { Args: { _room_id: string }; Returns: string }
+      record_multi_result: {
+        Args: {
+          _accuracy: number
+          _errors: number
+          _finished_at: string
+          _room_id: string
+          _user_id: string
+          _wpm: number
+        }
+        Returns: {
+          already: boolean
+          placement: number
+          points: number
+        }[]
+      }
       server_time: { Args: never; Returns: string }
       set_player_connected: {
         Args: { _connected: boolean; _room_id: string; _user_id: string }

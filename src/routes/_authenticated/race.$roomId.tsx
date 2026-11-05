@@ -43,7 +43,8 @@ function Race() {
   const serverNow = now + offset;
   const started = startsAt !== null && serverNow >= startsAt;
   const alreadyFinished = !!me?.finished_at;
-  const baseCanType = started && !alreadyFinished && room?.status !== "finished" && !!me;
+  const [restored, setRestored] = useState(false);
+  const baseCanType = started && restored && !alreadyFinished && room?.status !== "finished" && !!me;
   const engine = useTypingEngine(text, baseCanType, startsAt !== null ? startsAt - offset : null);
   const { index, errors } = engine;
   const done = index >= text.length && text.length > 0;
@@ -91,6 +92,22 @@ function Race() {
 
   // Anti-cheat checkpoints every 2s (char index + cumulative typos)
   const lastCp = useRef(0);
+
+  // After a refresh mid-race, pick up from our last checkpoint so the trail stays consistent.
+  const { restore } = engine;
+  useEffect(() => {
+    if (!user || !text || restored) return;
+    let cancelled = false;
+    void supabase.from("race_checkpoints").select("char_index, errors")
+      .eq("room_id", roomId).eq("user_id", user.id)
+      .order("char_index", { ascending: false }).order("errors", { ascending: false }).limit(1).maybeSingle()
+      .then(({ data: cp }) => {
+        if (cancelled) return;
+        if (cp && cp.char_index <= text.length) { restore(cp.char_index, cp.errors); lastCp.current = cp.char_index; }
+        setRestored(true);
+      });
+    return () => { cancelled = true; };
+  }, [user, text, roomId, restored, restore]);
   const insertCheckpoint = useCallback(async () => {
     const { index: charIndex, errors: errs } = engine.live.current;
     if (!user || charIndex <= lastCp.current) return;

@@ -22,6 +22,27 @@
       "when": 1793897087524,
       "tag": "0002_solo_leaderboard_rematch",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1793898006871,
+      "tag": "0003_qa_hardening",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1793898033017,
+      "tag": "0004_server_time_search_path",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1793899206813,
+      "tag": "0005_join_room_finished_message",
+      "breakpoints": true
     }
   ]
 }

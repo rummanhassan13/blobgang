@@ -9,11 +9,12 @@ export type GhostInfo = { kind: "best" | "average" | "bot"; wpm: number; timelin
 
 export const startSolo = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator(z.object({ difficulty: z.enum(["any", "easy", "medium", "hard"]) }))
+  .inputValidator(z.object({ difficulty: z.enum(["any", "easy", "medium", "hard"]), passageId: z.number().int().positive().optional() }))
   .handler(async ({ data, context }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     let q = supabaseAdmin.from("passages").select("id, text, difficulty");
-    if (data.difficulty !== "any") q = q.eq("difficulty", data.difficulty);
+    if (data.passageId) q = q.eq("id", data.passageId);
+    else if (data.difficulty !== "any") q = q.eq("difficulty", data.difficulty);
     const { data: list } = await q;
     if (!list?.length) throw new Error("No passages available");
     const passage = list[Math.floor(Math.random() * list.length)]!;
@@ -87,13 +88,6 @@ export const submitSolo = createServerFn({ method: "POST" })
       await supabaseAdmin.from("ghost_runs").upsert({ user_id: userId, passage_id: session.passage_id, wpm, timeline });
     }
 
-    const { data: prof } = await supabaseAdmin.from("profiles").select("*").eq("id", userId).single();
-    if (prof) {
-      await supabaseAdmin.from("profiles").update({
-        total_points: prof.total_points + points,
-        best_wpm: Math.max(Number(prof.best_wpm), wpm),
-        races_played: prof.races_played + 1,
-      }).eq("id", userId);
-    }
+    await supabaseAdmin.rpc("apply_profile_result", { _user_id: userId, _points: points, _wpm: wpm });
     return { ok: true as const, wpm, accuracy, points, newBest, previousBest: prevGhost ? Number(prevGhost.wpm) : null };
   });

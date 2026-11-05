@@ -27,6 +27,7 @@ const JOIN_ERRORS: Record<string, string> = {
   room_not_found: "We couldn't find that room.",
   race_in_progress: "That race already started. Ask for a new room!",
   room_full: "That room is full.",
+  race_finished: "That race is already over. Ask for a new room!",
 };
 
 function Lobby() {

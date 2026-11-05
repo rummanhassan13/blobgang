@@ -73,7 +73,7 @@ function Solo() {
     return () => clearInterval(id);
   }, []);
 
-  async function begin(d: Difficulty) {
+  async function begin(d: Difficulty, passageId?: number) {
     setDifficulty(d);
     setLoading(true);
     setResult(null);
@@ -82,7 +82,7 @@ function Solo() {
     lastCp.current = 0;
     submittedFor.current = null;
     try {
-      setSession(await startSolo({ data: { difficulty: d } }));
+      setSession(await startSolo({ data: { difficulty: d, passageId } }));
     } catch {
       toast.error("Could not start a solo race.");
     } finally {
@@ -184,7 +184,8 @@ function Solo() {
             </>
           )}
           <div className="mt-6 flex flex-wrap justify-center gap-3">
-            <Button variant="jelly" onClick={() => begin(difficulty)}>Race again</Button>
+            <Button variant="jelly" onClick={() => begin(difficulty, session?.passage.id)}>Rematch my ghost</Button>
+            <Button variant="soft" onClick={() => begin(difficulty)}>New passage</Button>
             <Button variant="soft" onClick={() => setSession(null)}>Change difficulty</Button>
             <Button asChild variant="ghost"><Link to="/leaderboard">Leaderboard</Link></Button>
           </div>
