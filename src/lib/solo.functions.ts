@@ -87,13 +87,6 @@ export const submitSolo = createServerFn({ method: "POST" })
       await supabaseAdmin.from("ghost_runs").upsert({ user_id: userId, passage_id: session.passage_id, wpm, timeline });
     }
 
-    const { data: prof } = await supabaseAdmin.from("profiles").select("*").eq("id", userId).single();
-    if (prof) {
-      await supabaseAdmin.from("profiles").update({
-        total_points: prof.total_points + points,
-        best_wpm: Math.max(Number(prof.best_wpm), wpm),
-        races_played: prof.races_played + 1,
-      }).eq("id", userId);
-    }
+    await supabaseAdmin.rpc("apply_profile_result", { _user_id: userId, _points: points, _wpm: wpm });
     return { ok: true as const, wpm, accuracy, points, newBest, previousBest: prevGhost ? Number(prevGhost.wpm) : null };
   });
