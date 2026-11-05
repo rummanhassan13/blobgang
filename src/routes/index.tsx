@@ -3,7 +3,12 @@ import { seo, SITE_URL, OG_IMAGE } from "@/lib/seo";
 import { motion } from "framer-motion";
 import { Blob } from "@/components/blob/Blob";
 import { Button } from "@/components/ui/button";
-import { BLOB_INFO, BLOB_TYPES, type BlobAnimation } from "@/lib/blobs";
+import { useState, type ReactNode } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { ScrollBackdrop } from "@/components/landing/ScrollBackdrop";
+import { useUser } from "@/hooks/use-auth";
+import { supabase } from "@/integrations/supabase/client";
+import { BLOB_INFO, BLOB_TYPES, isBlobType, type BlobAnimation, type BlobType } from "@/lib/blobs";
 
 export const Route = createFileRoute("/")({
   head: () => {
@@ -37,15 +42,96 @@ export const Route = createFileRoute("/")({
 
 const ANIMS: BlobAnimation[] = ["happy", "squash", "jiggle", "idle", "happy", "squash"];
 
+function Reveal({ children, className, delay = 0 }: { children: ReactNode; className?: string; delay?: number }) {
+  return (
+    <motion.div initial={{ opacity: 0, y: 28 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-60px" }}
+      transition={{ duration: 0.6, delay, ease: [0.22, 1, 0.36, 1] }} className={className}>
+      {children}
+    </motion.div>
+  );
+}
+
+const STEPS: { blob: BlobType; anim: BlobAnimation; title: string; text: string }[] = [
+  { blob: "mochi", anim: "happy", title: "Pick your blob", text: "Six squishy originals. Choose the one that matches your typing energy." },
+  { blob: "gloop", anim: "jiggle", title: "Share a room link", text: "Create a room and send the link. Friends hop in with one tap." },
+  { blob: "zippy", anim: "squash", title: "Type to squish ahead", text: "Every correct word pushes your blob down the lane. Typos make it wobble." },
+];
+
+function GangCard({ t, i }: { t: BlobType; i: number }) {
+  const [active, setActive] = useState(false);
+  return (
+    <Reveal delay={i * 0.05}>
+      <button type="button" aria-label={`${BLOB_INFO[t].name}: ${BLOB_INFO[t].tagline}`}
+        onMouseEnter={() => setActive(true)} onMouseLeave={() => setActive(false)}
+        onFocus={() => setActive(true)} onBlur={() => setActive(false)}
+        onClick={() => setActive((a) => !a)}
+        className="glass flex w-full flex-col items-center rounded-[2rem] p-5 transition-transform duration-300 hover:-translate-y-1 sm:p-6">
+        <Blob key={active ? "squash" : "idle"} type={t} size={88} animation={active ? "squash" : "idle"} mood={active ? "happy" : undefined} />
+        <h3 className="mt-3 text-lg font-bold sm:text-xl">{BLOB_INFO[t].name}</h3>
+        <p className="text-sm text-muted-foreground">{BLOB_INFO[t].tagline}</p>
+      </button>
+    </Reveal>
+  );
+}
+
+type Top = { rank: number; username: string; blob: string; points: number; best_wpm: number };
+const PREVIEW: Top[] = [
+  { rank: 1, username: "jellyfast", blob: "zippy", points: 412, best_wpm: 96 },
+  { rank: 2, username: "wobblequeen", blob: "bubbles", points: 377, best_wpm: 88 },
+  { rank: 3, username: "captn_k", blob: "gloop", points: 301, best_wpm: 81 },
+];
+
+function LeaderTeaser() {
+  const { user } = useUser();
+  const { data } = useQuery({
+    queryKey: ["leaderboard-teaser"],
+    enabled: !!user,
+    queryFn: async () => {
+      const { data, error } = await supabase.rpc("get_leaderboard", { _period: "daily", _limit: 3 });
+      if (error) throw error;
+      return (data as Top[]).filter((r) => r.rank <= 3);
+    },
+  });
+  const live = !!user && !!data?.length;
+  const rows = live ? data! : PREVIEW;
+  return (
+    <div className="glass mx-auto w-full max-w-xl rounded-[2rem] p-4 text-left sm:p-6">
+      <div className="mb-3 flex items-center justify-between gap-2 px-2">
+        <p className="font-display text-lg font-bold">{live ? "Today's top blobs" : "Top blobs (preview)"}</p>
+        <span className="text-xs text-muted-foreground">{live ? "UTC day" : "sign in for live ranks"}</span>
+      </div>
+      <ol className="space-y-2">
+        {rows.map((r) => (
+          <li key={r.rank} className="flex items-center gap-3 rounded-full bg-card/70 px-3 py-2">
+            <span className="w-6 shrink-0 text-center font-display font-bold">{r.rank}</span>
+            <Blob type={isBlobType(r.blob) ? r.blob : "bubbles"} size={34} animation="none" />
+            <span className="min-w-0 flex-1 truncate font-semibold">{r.username}</span>
+            <span className="hidden text-sm text-muted-foreground min-[400px]:inline">{Math.round(r.best_wpm)} wpm</span>
+            <span className="shrink-0 font-display font-bold">{r.points} <span className="text-xs font-normal text-muted-foreground">pts</span></span>
+          </li>
+        ))}
+      </ol>
+      <div className="mt-4 flex justify-center">
+        <Button asChild variant="soft"><Link to="/leaderboard">See the full leaderboard</Link></Button>
+      </div>
+    </div>
+  );
+}
+
+const sectionCls = "mt-24 w-full sm:mt-32";
+const h2Cls = "text-3xl font-bold sm:text-4xl";
+
 function Landing() {
   return (
-    <main className="mx-auto flex w-full max-w-6xl flex-1 flex-col items-center px-4 pb-16 pt-6 text-center sm:px-6">
+    <>
+    <ScrollBackdrop />
+    <main className="mx-auto flex w-full max-w-6xl flex-1 flex-col items-center px-4 pb-10 pt-6 text-center sm:px-6">
       <motion.p initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
         className="rounded-full bg-card px-4 py-1.5 text-sm font-semibold text-muted-foreground shadow-soft">
         multiplayer typing races, but squishy
       </motion.p>
       <motion.h1 initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ type: "spring", stiffness: 200, damping: 14 }}
-        className="mt-5 text-6xl font-bold leading-[0.95] sm:text-8xl">
+        className="mt-5 text-5xl font-bold leading-[0.95] min-[400px]:text-6xl sm:text-8xl">
         Type fast.<br />Wobble faster.
       </motion.h1>
       <p className="mt-5 max-w-lg text-lg text-muted-foreground">
@@ -72,21 +158,76 @@ function Landing() {
         </div>
       </div>
 
-      {/* Meet the gang */}
-      <section aria-labelledby="gang-heading" className="w-full">
-      <h2 id="gang-heading" className="mt-20 text-4xl font-bold">Meet the gang</h2>
-      <div className="mt-8 grid w-full grid-cols-2 gap-4 [contain-intrinsic-size:auto_600px] [content-visibility:auto] md:grid-cols-3">
-        {BLOB_TYPES.map((t, i) => (
-          <motion.div key={t} initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
-            transition={{ delay: i * 0.06, type: "spring", stiffness: 200, damping: 16 }} whileHover={{ y: -6, rotate: i % 2 ? 1.5 : -1.5 }}
-            className="glass flex flex-col items-center rounded-[2rem] p-6">
-            <Blob type={t} size={96} animation="idle" />
-            <h3 className="mt-3 text-xl font-bold">{BLOB_INFO[t].name}</h3>
-            <p className="text-sm text-muted-foreground">{BLOB_INFO[t].tagline}</p>
-          </motion.div>
-        ))}
-      </div>
+      <section aria-labelledby="how-heading" className={sectionCls}>
+        <Reveal><h2 id="how-heading" className={h2Cls}>How it works</h2></Reveal>
+        <ol className="mt-10 grid gap-5 md:grid-cols-3">
+          {STEPS.map((s, i) => (
+            <li key={s.title}>
+              <Reveal delay={i * 0.1} className="glass flex h-full flex-col items-center rounded-[2rem] p-6">
+                <span className="mb-1 rounded-full bg-secondary px-3 py-0.5 text-xs font-bold text-muted-foreground">Step {i + 1}</span>
+                <Blob type={s.blob} size={72} animation={s.anim} />
+                <h3 className="mt-2 text-xl font-bold">{s.title}</h3>
+                <p className="mt-1 text-muted-foreground">{s.text}</p>
+              </Reveal>
+            </li>
+          ))}
+        </ol>
+      </section>
+
+      <section aria-labelledby="gang-heading" className={sectionCls}>
+        <Reveal>
+          <h2 id="gang-heading" className={h2Cls}>Meet the gang</h2>
+          <p className="mt-2 text-muted-foreground">Hover or tap a blob to give it a squish.</p>
+        </Reveal>
+        <div className="mt-8 grid w-full grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3">
+          {BLOB_TYPES.map((t, i) => <GangCard key={t} t={t} i={i} />)}
+        </div>
+      </section>
+
+      <section aria-labelledby="modes-heading" className={sectionCls}>
+        <Reveal><h2 id="modes-heading" className={h2Cls}>Race modes</h2></Reveal>
+        <div className="mt-10 grid gap-5 md:grid-cols-2">
+          <Reveal className="glass flex flex-col items-center rounded-[2rem] p-7 sm:p-8">
+            <div className="flex -space-x-4"><Blob type="grumbo" size={64} animation="jiggle" /><Blob type="bubbles" size={64} animation="happy" /><Blob type="snooze" size={64} animation="idle" /></div>
+            <h3 className="mt-3 text-2xl font-bold">Multiplayer rooms</h3>
+            <p className="mt-2 max-w-sm text-muted-foreground">Up to 8 friends, one passage, live lanes. Placement bonuses for the quickest blobs.</p>
+            <Button asChild variant="jelly" className="mt-5"><Link to="/home">Start a room</Link></Button>
+          </Reveal>
+          <Reveal delay={0.1} className="glass flex flex-col items-center rounded-[2rem] p-7 sm:p-8">
+            <div className="flex -space-x-6"><Blob type="mochi" size={64} animation="squash" /><Blob type="mochi" size={64} animation="idle" ghost /></div>
+            <h3 className="mt-3 text-2xl font-bold">Solo ghost practice</h3>
+            <p className="mt-2 max-w-sm text-muted-foreground">Race a see-through ghost of your best run and beat your own record.</p>
+            <Button asChild variant="soft" className="mt-5"><Link to="/solo">Practice solo</Link></Button>
+          </Reveal>
+        </div>
+      </section>
+
+      <section aria-labelledby="ranks-heading" className={sectionCls}>
+        <Reveal><h2 id="ranks-heading" className={h2Cls}>Who's wobbling fastest?</h2></Reveal>
+        <Reveal delay={0.1} className="mt-8"><LeaderTeaser /></Reveal>
+      </section>
+
+      <section aria-labelledby="cta-heading" className={sectionCls}>
+        <Reveal className="glass flex flex-col items-center rounded-[2.5rem] px-6 py-12 sm:py-16">
+          <Blob type="bubbles" size={96} animation="happy" mood="happy" />
+          <h2 id="cta-heading" className="mt-3 text-4xl font-bold sm:text-6xl">Ready to wobble?</h2>
+          <p className="mt-3 max-w-md text-muted-foreground">It's free and takes ten seconds to pick a blob.</p>
+          <div className="mt-7 flex flex-wrap justify-center gap-3">
+            <Button asChild variant="jelly" size="lg"><Link to="/auth">Sign up</Link></Button>
+            <Button asChild variant="soft" size="lg"><Link to="/solo">Play solo</Link></Button>
+          </div>
+        </Reveal>
       </section>
     </main>
+    <footer className="mx-auto flex w-full max-w-6xl flex-col items-center justify-between gap-3 px-4 pb-[max(1.5rem,env(safe-area-inset-bottom))] pt-6 text-sm text-muted-foreground sm:flex-row sm:px-6">
+      <span className="flex items-center gap-2 font-display font-semibold text-foreground"><Blob type="bubbles" size={24} animation="none" /> Blob Gang</span>
+      <nav aria-label="Footer" className="flex gap-1">
+        <Link to="/leaderboard" className="inline-flex min-h-11 items-center rounded-full px-3 hover:text-foreground">Leaderboard</Link>
+        <Link to="/solo" className="inline-flex min-h-11 items-center rounded-full px-3 hover:text-foreground">Solo</Link>
+        <Link to="/auth" className="inline-flex min-h-11 items-center rounded-full px-3 hover:text-foreground">Sign in</Link>
+      </nav>
+      <span>© {new Date().getUTCFullYear()} Blob Gang</span>
+    </footer>
+    </>
   );
 }
