@@ -18,7 +18,17 @@ export function computePoints(wpm: number, accuracy: number, placement: number):
   return Math.round(wpm * (accuracy / 100)) + (PLACEMENT_BONUS[placement - 1] ?? 5);
 }
 
-export type Checkpoint = { char_index: number; client_ts: string; server_ts: string };
+/** Solo races award half the base score; there is no placement bonus. */
+export function computeSoloPoints(wpm: number, accuracy: number): number {
+  return Math.round((wpm * (accuracy / 100)) / 2);
+}
+
+export type Checkpoint = { char_index: number; client_ts: string; server_ts: string; errors?: number };
+
+/** Typo count from the checkpoint trail (cumulative, so the last one wins). */
+export function checkpointErrors(checkpoints: Checkpoint[]): number {
+  return Math.max(0, checkpoints.at(-1)?.errors ?? 0);
+}
 
 /** Returns an error string if the run looks impossible, otherwise null. */
 export function validateRun(opts: {
@@ -32,7 +42,11 @@ export function validateRun(opts: {
   if (computeWpm(passageLength, receivedAt - startsAt) > MAX_WPM) return "Impossible speed";
   if (checkpoints.length < 2) return "Not enough checkpoints";
   let last = -1;
+  let lastErrors = 0;
   for (const c of checkpoints) {
+    const e = c.errors ?? 0;
+    if (e < lastErrors) return "Typo count went backwards";
+    lastErrors = e;
     const server = Date.parse(c.server_ts);
     const client = Date.parse(c.client_ts);
     if (c.char_index < last) return "Checkpoints went backwards";
