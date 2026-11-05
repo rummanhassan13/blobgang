@@ -4,10 +4,10 @@ import { BLOB_INFO, type BlobAnimation, type BlobMood, type BlobType } from "@/l
 type Props = {
   type: BlobType;
   size?: number;
-  mood?: BlobMood;
-  animation?: BlobAnimation;
-  className?: string;
-  title?: string;
+  mood?: BlobMood | undefined;
+  animation?: BlobAnimation | undefined;
+  className?: string | undefined;
+  title?: string | undefined;
 };
 
 const BODY: Record<BlobType, string> = {
@@ -98,10 +98,9 @@ export function Blob({ type, size = 96, mood, animation = "idle", className, tit
   const anim = animation === "none" ? undefined : ANIMS[animation];
   return (
     <motion.div
-      className={className}
       style={{ width: size, height: size, transformOrigin: "50% 90%" }}
-      animate={anim?.animate}
-      transition={anim?.transition}
+      {...(anim ? { animate: anim.animate, transition: anim.transition } : {})}
+      {...(className ? { className } : {})}
     >
       <svg viewBox="0 0 100 100" width={size} height={size} role="img" aria-label={title ?? BLOB_INFO[type].name}>
         <ellipse cx="50" cy="95" rx="30" ry="3.5" fill="var(--blob-ink)" opacity="0.1" />

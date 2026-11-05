@@ -31,7 +31,7 @@ function Profile() {
   async function save() {
     if (!user) return;
     const { error } = await supabase.from("profiles").update({ blob }).eq("id", user.id);
-    if (error) return toast.error("Could not save");
+    if (error) { toast.error("Could not save"); return; }
     toast.success("Blob updated!");
     qc.invalidateQueries({ queryKey: ["profile", user.id] });
   }

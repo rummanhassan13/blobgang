@@ -40,12 +40,13 @@ function Home() {
     const passage = passages?.[Math.floor(Math.random() * passages.length)];
     const { data: room, error } = await supabase
       .from("rooms")
-      .insert({ code: makeCode(), host_id: user.id, passage_id: passage?.id })
+      .insert({ code: makeCode(), host_id: user.id, passage_id: passage?.id ?? null })
       .select()
       .single();
     if (error || !room) {
       setCreating(false);
-      return toast.error("Could not create a room. Try again.");
+      toast.error("Could not create a room. Try again.");
+      return;
     }
     await supabase.from("room_players").insert({ room_id: room.id, user_id: user.id, blob: profile.blob, username: profile.username });
     navigate({ to: "/lobby/$code", params: { code: room.code } });
@@ -54,7 +55,7 @@ function Home() {
   function join(e: React.FormEvent) {
     e.preventDefault();
     const c = code.trim().toUpperCase();
-    if (c.length < 4) return toast.error("Enter a room code");
+    if (c.length < 4) { toast.error("Enter a room code"); return; }
     navigate({ to: "/lobby/$code", params: { code: c } });
   }
 
