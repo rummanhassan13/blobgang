@@ -1,3 +1,4 @@
+import { seo } from "@/lib/seo";
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
@@ -9,14 +10,7 @@ import { isBlobType } from "@/lib/blobs";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/leaderboard")({
-  head: () => ({
-    meta: [
-      { title: "Leaderboard · Blob Gang" },
-      { name: "description", content: "The fastest blobs in the gang, today and all time." },
-      { property: "og:title", content: "Leaderboard · Blob Gang" },
-      { property: "og:description", content: "The fastest blobs in the gang, today and all time." },
-    ],
-  }),
+  head: () => seo({ title: "Leaderboard · Blob Gang", description: "The fastest, squishiest typists in Blob Gang, ranked by points today and all time.", path: "/leaderboard" }),
   component: Leaderboard,
 });
 

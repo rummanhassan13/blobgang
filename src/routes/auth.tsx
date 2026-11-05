@@ -1,3 +1,4 @@
+import { seo } from "@/lib/seo";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
@@ -17,14 +18,7 @@ function safeRedirect(v: unknown): string {
 export const Route = createFileRoute("/auth")({
   validateSearch: (s: Record<string, unknown>): { redirect?: string } =>
     typeof s["redirect"] === "string" ? { redirect: s["redirect"] } : {},
-  head: () => ({
-    meta: [
-      { title: "Sign in · Blob Gang" },
-      { name: "description", content: "Join the Blob Gang: pick your blob and start racing." },
-      { property: "og:title", content: "Sign in · Blob Gang" },
-      { property: "og:description", content: "Join the Blob Gang: pick your blob and start racing." },
-    ],
-  }),
+  head: () => seo({ title: "Sign in or join · Blob Gang", description: "Sign in or pick your blob and join Blob Gang, the squishy multiplayer typing race.", path: "/auth", noindex: true }),
   component: AuthPage,
 });
 

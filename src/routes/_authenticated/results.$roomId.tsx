@@ -1,3 +1,4 @@
+import { seo } from "@/lib/seo";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
@@ -13,14 +14,7 @@ import { isBlobType } from "@/lib/blobs";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/results/$roomId")({
-  head: () => ({
-    meta: [
-      { title: "Results · Blob Gang" },
-      { name: "description", content: "See who wobbled across the line first." },
-      { property: "og:title", content: "Results · Blob Gang" },
-      { property: "og:description", content: "See who wobbled across the line first." },
-    ],
-  }),
+  head: ({ params }) => seo({ title: "Race results · Blob Gang", description: "See who wobbled across the finish line first in this Blob Gang race.", path: `/results/${params.roomId}`, noindex: true }),
   component: Results,
 });
 

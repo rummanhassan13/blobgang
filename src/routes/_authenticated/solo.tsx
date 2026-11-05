@@ -1,3 +1,4 @@
+import { seo } from "@/lib/seo";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
@@ -19,14 +20,7 @@ import { computeAccuracy, computeWpm } from "@/lib/scoring";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/solo")({
-  head: () => ({
-    meta: [
-      { title: "Solo ghost race · Blob Gang" },
-      { name: "description", content: "Race the ghost of your best run and beat your own record." },
-      { property: "og:title", content: "Solo ghost race · Blob Gang" },
-      { property: "og:description", content: "Race the ghost of your best run and beat your own record." },
-    ],
-  }),
+  head: () => seo({ title: "Solo ghost race · Blob Gang", description: "Race the translucent ghost of your best run and beat your own typing record.", path: "/solo", noindex: true }),
   component: Solo,
 });
 

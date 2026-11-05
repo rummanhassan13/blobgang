@@ -1,3 +1,4 @@
+import { seo } from "@/lib/seo";
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
@@ -10,14 +11,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { isBlobType, type BlobType } from "@/lib/blobs";
 
 export const Route = createFileRoute("/_authenticated/profile")({
-  head: () => ({
-    meta: [
-      { title: "Profile · Blob Gang" },
-      { name: "description", content: "Your blob, your stats, your racing history." },
-      { property: "og:title", content: "Profile · Blob Gang" },
-      { property: "og:description", content: "Your blob, your stats, your racing history." },
-    ],
-  }),
+  head: () => seo({ title: "Your profile · Blob Gang", description: "Your blob, best WPM, total points and races played in Blob Gang.", path: "/profile", noindex: true }),
   component: Profile,
 });
 

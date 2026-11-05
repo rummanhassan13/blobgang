@@ -1,3 +1,4 @@
+import { seo } from "@/lib/seo";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { motion } from "framer-motion";
@@ -10,14 +11,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { isBlobType } from "@/lib/blobs";
 
 export const Route = createFileRoute("/_authenticated/home")({
-  head: () => ({
-    meta: [
-      { title: "Play · Blob Gang" },
-      { name: "description", content: "Create a room, join your friends by code, or race solo." },
-      { property: "og:title", content: "Play · Blob Gang" },
-      { property: "og:description", content: "Create a room, join your friends by code, or race solo." },
-    ],
-  }),
+  head: () => seo({ title: "Play · Blob Gang", description: "Create a race room, join your friends by code, or race your own ghost solo.", path: "/home", noindex: true }),
   component: Home,
 });
 

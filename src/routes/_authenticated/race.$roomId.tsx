@@ -1,3 +1,4 @@
+import { seo } from "@/lib/seo";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
@@ -15,14 +16,7 @@ import { submitResult } from "@/lib/race.functions";
 import { computeAccuracy, computeWpm } from "@/lib/scoring";
 
 export const Route = createFileRoute("/_authenticated/race/$roomId")({
-  head: () => ({
-    meta: [
-      { title: "Race · Blob Gang" },
-      { name: "description", content: "Type fast and push your blob to the finish line." },
-      { property: "og:title", content: "Race · Blob Gang" },
-      { property: "og:description", content: "Type fast and push your blob to the finish line." },
-    ],
-  }),
+  head: () => seo({ title: "Race · Blob Gang", description: "A live Blob Gang typing race is underway.", path: "/race", noindex: true }),
   component: Race,
 });
 
