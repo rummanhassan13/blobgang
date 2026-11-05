@@ -20,7 +20,7 @@ export function useTypingEngine(text: string, canType: boolean, startLocalMs: nu
   const bump = (anim: BlobAnimation) => { pulseN.current += 1; setPulse({ anim, n: pulseN.current }); };
 
   const onChar = useCallback((ch: string) => {
-    console.log('DBGCHAR', ch, canType, st.current.index, st.current.hasError, JSON.stringify(text[st.current.index]));
+    ((window as any).__dbg ??= []).push([ch, canType, st.current.index, st.current.hasError, text[st.current.index]]);
     if (!canType) return;
     const s = st.current;
     if (s.index >= text.length) return;
