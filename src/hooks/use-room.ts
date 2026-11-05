@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import type { RealtimeChannel } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
@@ -61,21 +61,33 @@ export function useRoomLive(roomId: string | undefined, userId: string | undefin
     const db = supabase
       .channel(`room-db-${roomId}-${Math.random().toString(36).slice(2)}`)
       .on("postgres_changes", { event: "*", schema: "public", table: "rooms", filter: `id=eq.${roomId}` }, invalidate)
-      .on("postgres_changes", { event: "*", schema: "public", table: "room_players", filter: `room_id=eq.${roomId}` }, invalidate)
+      .on("postgres_changes", { event: "*", schema: "public", table: "room_players", filter: `room_id=eq.${roomId}` }, (payload) => {
+        invalidate();
+        // Someone wrongly marked us offline while we're here: restore
+        const row = payload.new as { user_id?: string; connected?: boolean } | undefined;
+        if (row?.user_id === userId && row.connected === false && subscribed.current) {
+          supabase.rpc("set_player_connected", { _room_id: roomId, _user_id: userId, _connected: true });
+        }
+      })
       .subscribe();
 
     const live = supabase.channel(`room-live-${roomId}`, { config: { presence: { key: userId }, broadcast: { self: false } } });
     live
-      .on("presence", { event: "sync" }, () => console.log("[sync]", userId?.slice(0,4), Object.keys(live.presenceState())) || setOnline(new Set(Object.keys(live.presenceState()))))
+      .on("presence", { event: "sync" }, () => setOnline(new Set(Object.keys(live.presenceState()))))
       .on("presence", { event: "leave" }, ({ key }) => {
-        if (key && key !== userId) supabase.rpc("set_player_connected", { _room_id: roomId, _user_id: key, _connected: false });
+        if (!key || key === userId) return;
+        // Debounce: brief reconnects (navigation between lobby and race) should not mark a drop
+        setTimeout(() => {
+          if (!(key in live.presenceState())) {
+            supabase.rpc("set_player_connected", { _room_id: roomId, _user_id: key, _connected: false });
+          }
+        }, 4000);
       })
       .on("broadcast", { event: "progress" }, ({ payload }) => {
         const p = payload as ProgressMsg;
         setProgress((prev) => ({ ...prev, [p.userId]: p }));
       })
-      .subscribe(async (status, err) => {
-        console.log("[live]", userId?.slice(0,4), status, err?.message);
+      .subscribe(async (status) => {
         if (status === "SUBSCRIBED") {
           subscribed.current = true;
           await live.track({ at: Date.now() });
@@ -91,8 +103,8 @@ export function useRoomLive(roomId: string | undefined, userId: string | undefin
     };
   }, [roomId, userId, qc]);
 
-  const sendProgress = (msg: ProgressMsg) => {
+  const sendProgress = useCallback((msg: ProgressMsg) => {
     if (subscribed.current) channelRef.current?.send({ type: "broadcast", event: "progress", payload: msg });
-  };
+  }, []);
   return { online, progress, sendProgress };
 }
