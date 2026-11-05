@@ -1,18 +1,37 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { seo, SITE_URL, OG_IMAGE } from "@/lib/seo";
 import { motion } from "framer-motion";
 import { Blob } from "@/components/blob/Blob";
 import { Button } from "@/components/ui/button";
 import { BLOB_INFO, BLOB_TYPES, type BlobAnimation } from "@/lib/blobs";
 
 export const Route = createFileRoute("/")({
-  head: () => ({
-    meta: [
-      { title: "Blob Gang · Squishy multiplayer typing races" },
-      { name: "description", content: "Race your friends as jelly blobs. Type fast, wobble faster." },
-      { property: "og:title", content: "Blob Gang · Squishy multiplayer typing races" },
-      { property: "og:description", content: "Race your friends as jelly blobs. Type fast, wobble faster." },
-    ],
-  }),
+  head: () => {
+    const base = seo({
+      title: "Blob Gang: the squishy multiplayer typing race",
+      description: "Race your friends as squishy jelly blobs. Share a room code, type the same passage, and wobble across the finish line first. Free in your browser.",
+      path: "/",
+    });
+    return {
+      ...base,
+      scripts: [{
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": ["WebApplication", "VideoGame"],
+          name: "Blob Gang",
+          url: SITE_URL,
+          image: OG_IMAGE,
+          description: "A funky multiplayer typing race where players race as squishy jelly blobs.",
+          applicationCategory: "GameApplication",
+          genre: ["Typing game", "Racing", "Multiplayer"],
+          operatingSystem: "Any (web browser)",
+          playMode: ["MultiPlayer", "SinglePlayer"],
+          offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+        }),
+      }],
+    };
+  },
   component: Landing,
 });
 
@@ -21,10 +40,10 @@ const ANIMS: BlobAnimation[] = ["happy", "squash", "jiggle", "idle", "happy", "s
 function Landing() {
   return (
     <main className="mx-auto flex w-full max-w-6xl flex-1 flex-col items-center px-4 pb-16 pt-6 text-center sm:px-6">
-      <motion.span initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
+      <motion.p initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
         className="rounded-full bg-card px-4 py-1.5 text-sm font-semibold text-muted-foreground shadow-soft">
         multiplayer typing races, but squishy
-      </motion.span>
+      </motion.p>
       <motion.h1 initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ type: "spring", stiffness: 200, damping: 14 }}
         className="mt-5 text-6xl font-bold leading-[0.95] sm:text-8xl">
         Type fast.<br />Wobble faster.
@@ -38,7 +57,7 @@ function Landing() {
       </div>
 
       {/* Race track */}
-      <div className="glass relative mt-14 w-full overflow-hidden rounded-[2.5rem] px-4 py-8 sm:px-8">
+      <div role="img" aria-label="All six blobs racing along their lanes" className="glass relative mt-14 w-full overflow-hidden rounded-[2.5rem] px-4 py-8 sm:px-8">
         <div className="space-y-2">
           {BLOB_TYPES.map((t, i) => (
             <div key={t} className="relative h-16 border-b border-dashed border-border last:border-0">
@@ -54,8 +73,9 @@ function Landing() {
       </div>
 
       {/* Meet the gang */}
-      <h2 className="mt-20 text-4xl font-bold">Meet the gang</h2>
-      <div className="mt-8 grid w-full grid-cols-2 gap-4 md:grid-cols-3">
+      <section aria-labelledby="gang-heading" className="w-full">
+      <h2 id="gang-heading" className="mt-20 text-4xl font-bold">Meet the gang</h2>
+      <div className="mt-8 grid w-full grid-cols-2 gap-4 [contain-intrinsic-size:auto_600px] [content-visibility:auto] md:grid-cols-3">
         {BLOB_TYPES.map((t, i) => (
           <motion.div key={t} initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
             transition={{ delay: i * 0.06, type: "spring", stiffness: 200, damping: 16 }} whileHover={{ y: -6, rotate: i % 2 ? 1.5 : -1.5 }}
@@ -66,6 +86,7 @@ function Landing() {
           </motion.div>
         ))}
       </div>
+      </section>
     </main>
   );
 }
