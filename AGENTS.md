@@ -30,6 +30,7 @@ use the editor.
 <!-- LOVABLE:END -->
 
 ## Project rules
+- Password recovery stays on the public `/reset-password` page, requires a recovery link/session, and uses `updateUser({ password })` without a current password so emailed recovery works independently of normal sign-in.
 - Blob characters are a single SVG component (`src/components/blob/Blob.tsx`) driven by `type`/`mood`/`animation` props; colours come from `--blob-*` tokens so palette changes stay in CSS.
 - Signed-in pages live under `src/routes/_authenticated/` with `ssr: "data-only"` so the server still emits each page head (share cards, noindex) while the auth check and page render run in the browser; landing and auth stay public. Per-route head tags come from `seo()` in `src/lib/seo.ts`.
 - Race typing input accepts exactly one character per insertion (beforeinput + composition diffing in `TypingCard`); multi-character inserts are rejected. `RaceStage` pins the race above the phone keyboard via visualViewport.
