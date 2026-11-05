@@ -66,7 +66,7 @@ export function useRoomLive(roomId: string | undefined, userId: string | undefin
         // Someone wrongly marked us offline while we're here: restore
         const row = payload.new as { user_id?: string; connected?: boolean } | undefined;
         if (row?.user_id === userId && row.connected === false && subscribed.current) {
-          supabase.rpc("set_player_connected", { _room_id: roomId, _user_id: userId, _connected: true });
+          void supabase.rpc("set_player_connected", { _room_id: roomId, _user_id: userId, _connected: true }).then();
         }
       })
       .subscribe();
@@ -79,7 +79,7 @@ export function useRoomLive(roomId: string | undefined, userId: string | undefin
         // Debounce: brief reconnects (navigation between lobby and race) should not mark a drop
         setTimeout(() => {
           if (!(key in live.presenceState())) {
-            supabase.rpc("set_player_connected", { _room_id: roomId, _user_id: key, _connected: false });
+            void supabase.rpc("set_player_connected", { _room_id: roomId, _user_id: key, _connected: false }).then();
           }
         }, 4000);
       })
@@ -91,7 +91,7 @@ export function useRoomLive(roomId: string | undefined, userId: string | undefin
         if (status === "SUBSCRIBED") {
           subscribed.current = true;
           await live.track({ at: Date.now() });
-          await supabase.rpc("set_player_connected", { _room_id: roomId, _user_id: userId, _connected: true });
+          await void supabase.rpc("set_player_connected", { _room_id: roomId, _user_id: userId, _connected: true }).then();
         }
       });
     channelRef.current = live;

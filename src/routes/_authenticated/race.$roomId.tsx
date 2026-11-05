@@ -75,7 +75,7 @@ function Race({ roomId }: { roomId: string }) {
   // Nudge the server to advance status (countdown->racing, racing->finished)
   useEffect(() => {
     if (!room || room.status === "finished" || room.status === "lobby") return;
-    const id = setInterval(() => { supabase.rpc("advance_room", { _room_id: roomId }); }, 2000);
+    const id = setInterval(() => { void supabase.rpc("advance_room", { _room_id: roomId }).then(); }, 2000);
     return () => clearInterval(id);
   }, [room, roomId]);
 
