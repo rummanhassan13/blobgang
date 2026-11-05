@@ -6,6 +6,7 @@ import { BlobState } from "@/components/BlobState";
 import { Countdown } from "@/components/race/Countdown";
 import { Lanes, type LaneRacer } from "@/components/race/Lanes";
 import { TypingCard } from "@/components/race/TypingCard";
+import { RaceStage } from "@/components/race/RaceStage";
 import { Stats } from "@/components/race/Stats";
 import { Button } from "@/components/ui/button";
 import { useUser } from "@/hooks/use-auth";
@@ -156,12 +157,14 @@ function Race() {
   });
 
   return (
-    <main className="mx-auto w-full max-w-5xl space-y-4 px-3 py-4 sm:space-y-6 sm:px-6 sm:py-6">
-      <Countdown value={countdown} />
-      <Lanes racers={racers} />
-      <TypingCard text={text} index={alreadyFinished ? text.length : index} hasError={engine.hasError} errorTick={engine.errorTick}
-        disabled={!canType} onChar={engine.onChar} onBackspace={engine.onBackspace} />
-      <Stats wpm={wpm} accuracy={accuracy} waiting={done || alreadyFinished} />
-    </main>
+    <RaceStage>{(pinned) => (
+      <>
+        <Countdown value={countdown} />
+        <div className="shrink-0"><Lanes racers={racers} compact={pinned} /></div>
+        <TypingCard text={text} index={alreadyFinished ? text.length : index} hasError={engine.hasError} errorTick={engine.errorTick}
+          disabled={!canType} onChar={engine.onChar} onBackspace={engine.onBackspace} fill={pinned} />
+        <Stats wpm={wpm} accuracy={accuracy} waiting={done || alreadyFinished} />
+      </>
+    )}</RaceStage>
   );
 }
