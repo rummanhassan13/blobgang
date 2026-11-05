@@ -14,7 +14,7 @@ export function Playpen() {
 
   useEffect(() => {
     const box = boxRef.current; if (!box) return;
-    const size = () => (box.clientWidth < 480 ? 56 : 72);
+    const size = () => 64;
     let S = size(), W = box.clientWidth, H = box.clientHeight;
     const bodies: Body[] = BLOB_TYPES.map((_, i) => ({ x: (W - S) * ((i + 0.5) / BLOB_TYPES.length), y: H - S, vx: 0, vy: 0, sq: 0 }));
     let drag: { i: number; ox: number; oy: number; px: number; py: number; t: number } | null = null;
@@ -91,7 +91,7 @@ export function Playpen() {
           <div key={t} ref={(el) => { els.current[i] = el; }} title={BLOB_INFO[t].name}
             className="absolute left-0 top-0 cursor-grab touch-none will-change-transform active:cursor-grabbing"
             style={{ transformOrigin: "50% 100%" }}>
-            <Blob type={t} size={72} animation="none" className="h-14 w-14 sm:h-[72px] sm:w-[72px] [&>svg]:h-full [&>svg]:w-full" />
+            <Blob type={t} size={64} animation="none" />
           </div>
         ))}
       </div>
