@@ -10,6 +10,8 @@ import { Lanes, Splash } from "@/components/race/Lanes";
 import { RaceStage } from "@/components/race/RaceStage";
 import { Stats } from "@/components/race/Stats";
 import { TypingCard } from "@/components/race/TypingCard";
+import { NarratorControl } from "@/components/race/NarratorControl";
+import { useNarrator } from "@/hooks/use-narrator";
 import { Button } from "@/components/ui/button";
 import { useProfile, useUser } from "@/hooks/use-auth";
 import { useServerOffset } from "@/hooks/use-room";
@@ -62,6 +64,7 @@ function Solo() {
   const done = text.length > 0 && engine.index >= text.length;
   const canType = started && !done && !result;
   const blob = profile && isBlobType(profile.blob) ? profile.blob : "bubbles";
+  useNarrator(text, engine.index, canType, blob);
 
   useEffect(() => {
     const id = setInterval(() => setNow(Date.now()), 50);
@@ -190,6 +193,7 @@ function Solo() {
           <TypingCard text={text} index={engine.index} hasError={engine.hasError} errorTick={engine.errorTick}
             disabled={!canType} onChar={engine.onChar} onBackspace={engine.onBackspace} fill={pinned} />
           <Stats wpm={myWpm} accuracy={acc} />
+          <NarratorControl />
           <p className={cn("text-center text-xs text-muted-foreground", done && "animate-pulse")}>
             {done ? "Checking your run…" : `${session.passage.difficulty} passage`}
           </p>
