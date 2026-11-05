@@ -1,4 +1,9 @@
+import { useLocation } from "@tanstack/react-router";
+
 export function BackgroundBlobs() {
+  // The landing page has its own scroll-reactive backdrop
+  const { pathname } = useLocation();
+  if (pathname === "/") return null;
   return (
     <div aria-hidden className="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
       <div className="ambient-blob" style={{ width: "48vmax", height: "48vmax", top: "-14vmax", left: "-12vmax", background: "var(--ambient-1)" }} />
