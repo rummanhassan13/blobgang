@@ -82,7 +82,7 @@ function Home() {
           </form>
         </Card>
         <Card blob="snooze" title="Solo practice" text="Race your own ghost at your own pace.">
-          <Button variant="soft" className="w-full" onClick={() => navigate({ to: "/race/$roomId", params: { roomId: "solo" } })}>
+          <Button variant="soft" className="w-full" onClick={() => navigate({ to: "/solo" })}>
             Start solo
           </Button>
         </Card>

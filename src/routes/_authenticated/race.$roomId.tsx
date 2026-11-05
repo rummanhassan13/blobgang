@@ -5,6 +5,7 @@ import { BlobState } from "@/components/BlobState";
 import { Countdown } from "@/components/race/Countdown";
 import { Lanes, type LaneRacer } from "@/components/race/Lanes";
 import { TypingCard } from "@/components/race/TypingCard";
+import { Stats } from "@/components/race/Stats";
 import { Button } from "@/components/ui/button";
 import { useUser } from "@/hooks/use-auth";
 import { useRoomData, useRoomLive, useServerOffset } from "@/hooks/use-room";
@@ -151,15 +152,5 @@ function Race() {
         disabled={!canType} onChar={engine.onChar} onBackspace={engine.onBackspace} />
       <Stats wpm={wpm} accuracy={accuracy} waiting={done || alreadyFinished} />
     </main>
-  );
-}
-
-export function Stats({ wpm, accuracy, waiting }: { wpm: number; accuracy: number; waiting?: boolean }) {
-  return (
-    <div className="flex flex-wrap justify-center gap-x-8 gap-y-1 text-sm text-muted-foreground">
-      <span><b className="font-display text-lg text-foreground">{Math.round(wpm || 0)}</b> wpm</span>
-      <span><b className="font-display text-lg text-foreground">{Math.round(accuracy)}%</b> accuracy</span>
-      {waiting && <span>Waiting for the others…</span>}
-    </div>
   );
 }
