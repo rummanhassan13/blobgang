@@ -15,7 +15,6 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedHomeRouteImport } from './routes/_authenticated/home'
 import { Route as AuthenticatedLeaderboardRouteImport } from './routes/_authenticated/leaderboard'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
-import { Route as AuthenticatedLobbyCodeRouteImport } from './routes/_authenticated/lobby.$code'
 import { Route as AuthenticatedRaceRoomIdRouteImport } from './routes/_authenticated/race.$roomId'
 import { Route as AuthenticatedResultsRoomIdRouteImport } from './routes/_authenticated/results.$roomId'
 
@@ -49,11 +48,6 @@ const AuthenticatedProfileRoute = AuthenticatedProfileRouteImport.update({
   path: '/profile',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const AuthenticatedLobbyCodeRoute = AuthenticatedLobbyCodeRouteImport.update({
-  id: '/lobby/$code',
-  path: '/lobby/$code',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
 const AuthenticatedRaceRoomIdRoute = AuthenticatedRaceRoomIdRouteImport.update({
   id: '/race/$roomId',
   path: '/race/$roomId',
@@ -72,7 +66,6 @@ export interface FileRoutesByFullPath {
   '/home': typeof AuthenticatedHomeRoute
   '/leaderboard': typeof AuthenticatedLeaderboardRoute
   '/profile': typeof AuthenticatedProfileRoute
-  '/lobby/$code': typeof AuthenticatedLobbyCodeRoute
   '/race/$roomId': typeof AuthenticatedRaceRoomIdRoute
   '/results/$roomId': typeof AuthenticatedResultsRoomIdRoute
 }
@@ -82,7 +75,6 @@ export interface FileRoutesByTo {
   '/home': typeof AuthenticatedHomeRoute
   '/leaderboard': typeof AuthenticatedLeaderboardRoute
   '/profile': typeof AuthenticatedProfileRoute
-  '/lobby/$code': typeof AuthenticatedLobbyCodeRoute
   '/race/$roomId': typeof AuthenticatedRaceRoomIdRoute
   '/results/$roomId': typeof AuthenticatedResultsRoomIdRoute
 }
@@ -94,7 +86,6 @@ export interface FileRoutesById {
   '/_authenticated/home': typeof AuthenticatedHomeRoute
   '/_authenticated/leaderboard': typeof AuthenticatedLeaderboardRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
-  '/_authenticated/lobby/$code': typeof AuthenticatedLobbyCodeRoute
   '/_authenticated/race/$roomId': typeof AuthenticatedRaceRoomIdRoute
   '/_authenticated/results/$roomId': typeof AuthenticatedResultsRoomIdRoute
 }
@@ -106,7 +97,6 @@ export interface FileRouteTypes {
     | '/home'
     | '/leaderboard'
     | '/profile'
-    | '/lobby/$code'
     | '/race/$roomId'
     | '/results/$roomId'
   fileRoutesByTo: FileRoutesByTo
@@ -116,7 +106,6 @@ export interface FileRouteTypes {
     | '/home'
     | '/leaderboard'
     | '/profile'
-    | '/lobby/$code'
     | '/race/$roomId'
     | '/results/$roomId'
   id:
@@ -127,7 +116,6 @@ export interface FileRouteTypes {
     | '/_authenticated/home'
     | '/_authenticated/leaderboard'
     | '/_authenticated/profile'
-    | '/_authenticated/lobby/$code'
     | '/_authenticated/race/$roomId'
     | '/_authenticated/results/$roomId'
   fileRoutesById: FileRoutesById
@@ -182,13 +170,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedProfileRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_authenticated/lobby/$code': {
-      id: '/_authenticated/lobby/$code'
-      path: '/lobby/$code'
-      fullPath: '/lobby/$code'
-      preLoaderRoute: typeof AuthenticatedLobbyCodeRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
     '/_authenticated/race/$roomId': {
       id: '/_authenticated/race/$roomId'
       path: '/race/$roomId'
@@ -210,7 +191,6 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedHomeRoute: typeof AuthenticatedHomeRoute
   AuthenticatedLeaderboardRoute: typeof AuthenticatedLeaderboardRoute
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
-  AuthenticatedLobbyCodeRoute: typeof AuthenticatedLobbyCodeRoute
   AuthenticatedRaceRoomIdRoute: typeof AuthenticatedRaceRoomIdRoute
   AuthenticatedResultsRoomIdRoute: typeof AuthenticatedResultsRoomIdRoute
 }
@@ -219,7 +199,6 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedHomeRoute: AuthenticatedHomeRoute,
   AuthenticatedLeaderboardRoute: AuthenticatedLeaderboardRoute,
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
-  AuthenticatedLobbyCodeRoute: AuthenticatedLobbyCodeRoute,
   AuthenticatedRaceRoomIdRoute: AuthenticatedRaceRoomIdRoute,
   AuthenticatedResultsRoomIdRoute: AuthenticatedResultsRoomIdRoute,
 }
