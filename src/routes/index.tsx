@@ -121,7 +121,7 @@ function Landing() {
                 <div className="relative z-10 flex h-[4.5rem] w-[4.5rem] shrink-0 items-center justify-center rounded-full bg-background">
                   <Blob type={s.blob} size={60} animation={s.anim} />
                 </div>
-                <span aria-hidden className="font-display text-5xl font-bold leading-none text-primary/30 sm:text-6xl">{i + 1}</span>
+                <span aria-hidden className="w-10 shrink-0 text-center font-display text-5xl font-bold leading-none text-primary/30 sm:w-12 sm:text-6xl">{i + 1}</span>
                 <div className="min-w-0">
                   <h3 className="text-xl font-bold sm:text-2xl">{s.title}</h3>
                   <p className="mt-0.5 text-muted-foreground">{s.text}</p>
