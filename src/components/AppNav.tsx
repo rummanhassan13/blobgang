@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { useProfile, useUser } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
 import { isBlobType } from "@/lib/blobs";
+import { SoundToggle } from "@/components/SoundToggle";
 
 export function AppNav() {
   const { user, loading } = useUser();
@@ -28,6 +29,7 @@ export function AppNav() {
       </Link>
       {!loading && (
         <nav className="flex min-w-0 items-center gap-0.5 sm:gap-1">
+          <SoundToggle />
           {user ? (
             <>
               <Link to="/home" className={linkCls} activeProps={{ className: "bg-secondary text-foreground" }}>Play</Link>

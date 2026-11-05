@@ -1,6 +1,9 @@
 import { AnimatePresence, motion } from "framer-motion";
+import { useEffect } from "react";
+import { sfx } from "@/lib/sfx";
 
 export function Countdown({ value }: { value: number | null }) {
+  useEffect(() => { if (value === null) return; if (value === 0) sfx.go(); else sfx.count(); }, [value]);
   return (
     <AnimatePresence>
       {value !== null && (

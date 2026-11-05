@@ -4,11 +4,8 @@ import { motion } from "framer-motion";
 import { Blob } from "@/components/blob/Blob";
 import { Button } from "@/components/ui/button";
 import { useState, type ReactNode } from "react";
-import { useQuery } from "@tanstack/react-query";
 import { ScrollBackdrop } from "@/components/landing/ScrollBackdrop";
-import { useUser } from "@/hooks/use-auth";
-import { supabase } from "@/integrations/supabase/client";
-import { BLOB_INFO, BLOB_TYPES, isBlobType, type BlobAnimation, type BlobType } from "@/lib/blobs";
+import { BLOB_INFO, BLOB_TYPES, type BlobAnimation, type BlobType } from "@/lib/blobs";
 
 export const Route = createFileRoute("/")({
   head: () => {
@@ -74,50 +71,6 @@ function GangCard({ t, i }: { t: BlobType; i: number }) {
   );
 }
 
-type Top = { rank: number; username: string; blob: string; points: number; best_wpm: number };
-const PREVIEW: Top[] = [
-  { rank: 1, username: "jellyfast", blob: "zippy", points: 412, best_wpm: 96 },
-  { rank: 2, username: "wobblequeen", blob: "bubbles", points: 377, best_wpm: 88 },
-  { rank: 3, username: "captn_k", blob: "gloop", points: 301, best_wpm: 81 },
-];
-
-function LeaderTeaser() {
-  const { user } = useUser();
-  const { data } = useQuery({
-    queryKey: ["leaderboard-teaser"],
-    enabled: !!user,
-    queryFn: async () => {
-      const { data, error } = await supabase.rpc("get_leaderboard", { _period: "daily", _limit: 3 });
-      if (error) throw error;
-      return (data as Top[]).filter((r) => r.rank <= 3);
-    },
-  });
-  const live = !!user && !!data?.length;
-  const rows = live ? data! : PREVIEW;
-  return (
-    <div className="glass mx-auto w-full max-w-xl rounded-[2rem] p-4 text-left sm:p-6">
-      <div className="mb-3 flex items-center justify-between gap-2 px-2">
-        <p className="font-display text-lg font-bold">{live ? "Today's top blobs" : "Top blobs (preview)"}</p>
-        <span className="text-xs text-muted-foreground">{live ? "UTC day" : "sign in for live ranks"}</span>
-      </div>
-      <ol className="space-y-2">
-        {rows.map((r) => (
-          <li key={r.rank} className="flex items-center gap-3 rounded-full bg-card/70 px-3 py-2">
-            <span className="w-6 shrink-0 text-center font-display font-bold">{r.rank}</span>
-            <Blob type={isBlobType(r.blob) ? r.blob : "bubbles"} size={34} animation="none" />
-            <span className="min-w-0 flex-1 truncate font-semibold">{r.username}</span>
-            <span className="hidden text-sm text-muted-foreground min-[400px]:inline">{Math.round(r.best_wpm)} wpm</span>
-            <span className="shrink-0 font-display font-bold">{r.points} <span className="text-xs font-normal text-muted-foreground">pts</span></span>
-          </li>
-        ))}
-      </ol>
-      <div className="mt-4 flex justify-center">
-        <Button asChild variant="soft"><Link to="/leaderboard">See the full leaderboard</Link></Button>
-      </div>
-    </div>
-  );
-}
-
 const sectionCls = "mt-24 w-full sm:mt-32";
 const h2Cls = "text-3xl font-bold sm:text-4xl";
 
@@ -160,14 +113,19 @@ function Landing() {
 
       <section aria-labelledby="how-heading" className={sectionCls}>
         <Reveal><h2 id="how-heading" className={h2Cls}>How it works</h2></Reveal>
-        <ol className="mt-10 grid gap-5 md:grid-cols-3">
+        <ol className="relative mx-auto mt-10 max-w-3xl text-left">
+          <span aria-hidden className="absolute bottom-6 left-[2.25rem] top-6 w-0 border-l-2 border-dashed border-border" />
           {STEPS.map((s, i) => (
             <li key={s.title}>
-              <Reveal delay={i * 0.1} className="glass flex h-full flex-col items-center rounded-[2rem] p-6">
-                <span className="mb-1 rounded-full bg-secondary px-3 py-0.5 text-xs font-bold text-muted-foreground">Step {i + 1}</span>
-                <Blob type={s.blob} size={72} animation={s.anim} />
-                <h3 className="mt-2 text-xl font-bold">{s.title}</h3>
-                <p className="mt-1 text-muted-foreground">{s.text}</p>
+              <Reveal delay={i * 0.1} className="relative flex items-center gap-4 py-4 sm:gap-6">
+                <div className="relative z-10 flex h-[4.5rem] w-[4.5rem] shrink-0 items-center justify-center rounded-full bg-background">
+                  <Blob type={s.blob} size={60} animation={s.anim} />
+                </div>
+                <span aria-hidden className="w-10 shrink-0 text-center font-display text-5xl font-bold leading-none text-primary/30 sm:w-12 sm:text-6xl">{i + 1}</span>
+                <div className="min-w-0">
+                  <h3 className="text-xl font-bold sm:text-2xl">{s.title}</h3>
+                  <p className="mt-0.5 text-muted-foreground">{s.text}</p>
+                </div>
               </Reveal>
             </li>
           ))}
@@ -200,11 +158,6 @@ function Landing() {
             <Button asChild variant="soft" className="mt-5"><Link to="/solo">Practice solo</Link></Button>
           </Reveal>
         </div>
-      </section>
-
-      <section aria-labelledby="ranks-heading" className={sectionCls}>
-        <Reveal><h2 id="ranks-heading" className={h2Cls}>Who's wobbling fastest?</h2></Reveal>
-        <Reveal delay={0.1} className="mt-8"><LeaderTeaser /></Reveal>
       </section>
 
       <section aria-labelledby="cta-heading" className={sectionCls}>
