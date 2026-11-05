@@ -42,5 +42,12 @@ export function useTypingEngine(text: string, canType: boolean, startLocalMs: nu
     if (st.current.hasError) { st.current.hasError = false; setHasError(false); }
   }, []);
 
-  return { index, hasError, errors, errorTick, pulse, onChar, onBackspace, timeline, live: st };
+  /** Resume a race after a page refresh from the last server checkpoint. */
+  const restore = useCallback((i: number, errs: number) => {
+    const idx = Math.max(0, Math.min(i, text.length));
+    st.current = { index: idx, hasError: false, errors: Math.max(0, errs) };
+    setIndex(idx); setErrors(Math.max(0, errs)); setHasError(false);
+  }, [text]);
+
+  return { index, hasError, errors, errorTick, pulse, onChar, onBackspace, restore, timeline, live: st };
 }
