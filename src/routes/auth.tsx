@@ -10,7 +10,13 @@ import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import type { BlobType } from "@/lib/blobs";
 
+function safeRedirect(v: unknown): string {
+  return typeof v === "string" && v.startsWith("/") && !v.startsWith("//") ? v : "/home";
+}
+
 export const Route = createFileRoute("/auth")({
+  validateSearch: (s: Record<string, unknown>): { redirect?: string } =>
+    typeof s["redirect"] === "string" ? { redirect: s["redirect"] } : {},
   head: () => ({
     meta: [
       { title: "Sign in · Blob Gang" },
@@ -26,6 +32,8 @@ const USERNAME_RE = /^[A-Za-z0-9_]{3,20}$/;
 
 function AuthPage() {
   const navigate = useNavigate();
+  const search = Route.useSearch();
+  const next = safeRedirect(search.redirect);
   const [mode, setMode] = useState<"login" | "signup">("login");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -42,7 +50,7 @@ function AuthPage() {
       if (mode === "login") {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) { setWrong((w) => w + 1); throw error; }
-        navigate({ to: "/home" });
+        navigate({ to: next });
       } else {
         if (!USERNAME_RE.test(username)) throw new Error("Username: 3-20 letters, numbers or underscores.");
         const { data: ok, error: rpcErr } = await supabase.rpc("username_available", { _username: username });
@@ -50,7 +58,7 @@ function AuthPage() {
         if (!ok) throw new Error("That username is taken.");
         const { error } = await supabase.auth.signUp({
           email, password,
-          options: { emailRedirectTo: window.location.origin + "/home", data: { username, blob } },
+          options: { emailRedirectTo: window.location.origin + next, data: { username, blob } },
         });
         if (error) throw error;
         setSent(true);

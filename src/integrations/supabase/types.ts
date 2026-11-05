@@ -97,6 +97,41 @@ export type Database = {
         }
         Relationships: []
       }
+      race_checkpoints: {
+        Row: {
+          char_index: number
+          client_ts: string
+          id: number
+          room_id: string
+          server_ts: string
+          user_id: string
+        }
+        Insert: {
+          char_index: number
+          client_ts: string
+          id?: number
+          room_id: string
+          server_ts?: string
+          user_id: string
+        }
+        Update: {
+          char_index?: number
+          client_ts?: string
+          id?: number
+          room_id?: string
+          server_ts?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "race_checkpoints_room_id_fkey"
+            columns: ["room_id"]
+            isOneToOne: false
+            referencedRelation: "rooms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       race_results: {
         Row: {
           accuracy: number
@@ -152,9 +187,12 @@ export type Database = {
         Row: {
           accuracy: number
           blob: Database["public"]["Enums"]["blob_type"]
+          connected: boolean
+          errors: number
           finished_at: string | null
           joined_at: string
           placement: number | null
+          points: number
           progress: number
           room_id: string
           user_id: string
@@ -164,9 +202,12 @@ export type Database = {
         Insert: {
           accuracy?: number
           blob: Database["public"]["Enums"]["blob_type"]
+          connected?: boolean
+          errors?: number
           finished_at?: string | null
           joined_at?: string
           placement?: number | null
+          points?: number
           progress?: number
           room_id: string
           user_id: string
@@ -176,9 +217,12 @@ export type Database = {
         Update: {
           accuracy?: number
           blob?: Database["public"]["Enums"]["blob_type"]
+          connected?: boolean
+          errors?: number
           finished_at?: string | null
           joined_at?: string
           placement?: number | null
+          points?: number
           progress?: number
           room_id?: string
           user_id?: string
@@ -238,6 +282,35 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      advance_room: {
+        Args: { _room_id: string }
+        Returns: Database["public"]["Enums"]["room_status"]
+      }
+      join_room: {
+        Args: { _code: string }
+        Returns: {
+          code: string
+          created_at: string
+          host_id: string
+          id: string
+          passage_id: number | null
+          starts_at: string | null
+          status: Database["public"]["Enums"]["room_status"]
+        }
+        SetofOptions: {
+          from: "*"
+          to: "rooms"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      leave_room: { Args: { _room_id: string }; Returns: undefined }
+      server_time: { Args: never; Returns: string }
+      set_player_connected: {
+        Args: { _connected: boolean; _room_id: string; _user_id: string }
+        Returns: undefined
+      }
+      start_race: { Args: { _room_id: string }; Returns: string }
       username_available: { Args: { _username: string }; Returns: boolean }
     }
     Enums: {
