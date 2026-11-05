@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { computeAccuracy, computePoints, computeWpm, validateRun } from "@/lib/scoring";
+import { checkpointErrors, computeAccuracy, computePoints, computeWpm, validateRun } from "@/lib/scoring";
 
 /**
  * submit-result: the only path that writes race stats. Finish time is the server
@@ -9,7 +9,7 @@ import { computeAccuracy, computePoints, computeWpm, validateRun } from "@/lib/s
  */
 export const submitResult = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator(z.object({ roomId: z.string().uuid(), errors: z.number().int().min(0).max(10000) }))
+  .inputValidator(z.object({ roomId: z.string().uuid() }))
   .handler(async ({ data, context }) => {
     const receivedAt = Date.now();
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
@@ -29,7 +29,7 @@ export const submitResult = createServerFn({ method: "POST" })
     const chars = passage.text.length;
 
     const { data: checkpoints } = await supabaseAdmin
-      .from("race_checkpoints").select("char_index, client_ts, server_ts")
+      .from("race_checkpoints").select("char_index, client_ts, server_ts, errors")
       .eq("room_id", room.id).eq("user_id", userId).order("server_ts");
 
     const startsAt = Date.parse(room.starts_at);
@@ -37,7 +37,8 @@ export const submitResult = createServerFn({ method: "POST" })
     if (problem) return { ok: false as const, error: problem };
 
     const wpm = Math.round(computeWpm(chars, receivedAt - startsAt) * 10) / 10;
-    const accuracy = Math.round(computeAccuracy(chars, data.errors) * 10) / 10;
+    const errors = checkpointErrors(checkpoints ?? []);
+    const accuracy = Math.round(computeAccuracy(chars, errors) * 10) / 10;
     const { count } = await supabaseAdmin
       .from("room_players").select("*", { count: "exact", head: true })
       .eq("room_id", room.id).not("finished_at", "is", null);
@@ -46,7 +47,7 @@ export const submitResult = createServerFn({ method: "POST" })
 
     const { data: updated } = await supabaseAdmin
       .from("room_players")
-      .update({ progress: 1, wpm, accuracy, errors: data.errors, placement, points, finished_at: new Date(receivedAt).toISOString() })
+      .update({ progress: 1, wpm, accuracy, errors, placement, points, finished_at: new Date(receivedAt).toISOString() })
       .eq("room_id", room.id).eq("user_id", userId).is("finished_at", null)
       .select().maybeSingle();
     if (!updated) return { ok: true as const, placement: player.placement, wpm };
