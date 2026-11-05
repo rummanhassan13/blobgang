@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
  * Race layout. When a phone keyboard is open, the stage pins itself to the visible
  * area above the keyboard so lanes + typing card both stay on screen and the page can't scroll.
  */
-export function RaceStage({ children, lanes, footer }: { children: ReactNode; lanes: ReactNode; footer?: ReactNode }) {
+export function RaceStage({ children, lanes, footer }: { children: ReactNode; lanes: (compact: boolean) => ReactNode; footer?: ReactNode }) {
   const vv = useVisualViewport();
   const pinned = !!vv?.keyboardOpen;
 
@@ -29,7 +29,7 @@ export function RaceStage({ children, lanes, footer }: { children: ReactNode; la
       )}
       style={pinned && vv ? { height: vv.height, transform: `translateY(${vv.top}px)` } : undefined}
     >
-      <div className="shrink-0">{lanes}</div>
+      <div className="shrink-0">{lanes(pinned)}</div>
       <div className={cn("flex flex-col", pinned && "min-h-0 flex-1")}>{children}</div>
       {footer && <div className="shrink-0">{footer}</div>}
     </main>
