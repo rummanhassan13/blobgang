@@ -9,11 +9,12 @@ export type GhostInfo = { kind: "best" | "average" | "bot"; wpm: number; timelin
 
 export const startSolo = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator(z.object({ difficulty: z.enum(["any", "easy", "medium", "hard"]) }))
+  .inputValidator(z.object({ difficulty: z.enum(["any", "easy", "medium", "hard"]), passageId: z.number().int().positive().optional() }))
   .handler(async ({ data, context }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     let q = supabaseAdmin.from("passages").select("id, text, difficulty");
-    if (data.difficulty !== "any") q = q.eq("difficulty", data.difficulty);
+    if (data.passageId) q = q.eq("id", data.passageId);
+    else if (data.difficulty !== "any") q = q.eq("difficulty", data.difficulty);
     const { data: list } = await q;
     if (!list?.length) throw new Error("No passages available");
     const passage = list[Math.floor(Math.random() * list.length)]!;
