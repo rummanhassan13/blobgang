@@ -33,7 +33,7 @@ function Leaderboard() {
       <div className="mx-auto mt-5 grid max-w-xs grid-cols-2 rounded-full bg-secondary p-1" role="tablist">
         {(["daily", "all"] as const).map((p) => (
           <button key={p} role="tab" aria-selected={period === p} onClick={() => setPeriod(p)}
-            className="relative rounded-full py-2 font-display text-sm font-semibold">
+            className="relative min-h-11 rounded-full py-2 font-display text-sm font-semibold">
             {period === p && <motion.span layoutId="lbtab" className="absolute inset-0 rounded-full bg-card shadow-soft" transition={{ type: "spring", stiffness: 400, damping: 30 }} />}
             <span className="relative">{p === "daily" ? "Today (UTC)" : "All-time"}</span>
           </button>
