@@ -11,7 +11,9 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
+import { Route as AuthenticatedHomeRouteImport } from './routes/_authenticated/home'
 import { Route as AuthenticatedLeaderboardRouteImport } from './routes/_authenticated/leaderboard'
+import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
 import { Route as AuthenticatedLobbyCodeRouteImport } from './routes/_authenticated/lobby.$code'
 import { Route as AuthenticatedRaceRoomIdRouteImport } from './routes/_authenticated/race.$roomId'
 import { Route as AuthenticatedResultsRoomIdRouteImport } from './routes/_authenticated/results.$roomId'
@@ -25,12 +27,22 @@ const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
   id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedHomeRoute = AuthenticatedHomeRouteImport.update({
+  id: '/home',
+  path: '/home',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedLeaderboardRoute =
   AuthenticatedLeaderboardRouteImport.update({
     id: '/leaderboard',
     path: '/leaderboard',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedProfileRoute = AuthenticatedProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedLobbyCodeRoute = AuthenticatedLobbyCodeRouteImport.update({
   id: '/lobby/$code',
   path: '/lobby/$code',
@@ -50,14 +62,18 @@ const AuthenticatedResultsRoomIdRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/home': typeof AuthenticatedHomeRoute
   '/leaderboard': typeof AuthenticatedLeaderboardRoute
+  '/profile': typeof AuthenticatedProfileRoute
   '/lobby/$code': typeof AuthenticatedLobbyCodeRoute
   '/race/$roomId': typeof AuthenticatedRaceRoomIdRoute
   '/results/$roomId': typeof AuthenticatedResultsRoomIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/home': typeof AuthenticatedHomeRoute
   '/leaderboard': typeof AuthenticatedLeaderboardRoute
+  '/profile': typeof AuthenticatedProfileRoute
   '/lobby/$code': typeof AuthenticatedLobbyCodeRoute
   '/race/$roomId': typeof AuthenticatedRaceRoomIdRoute
   '/results/$roomId': typeof AuthenticatedResultsRoomIdRoute
@@ -66,7 +82,9 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
+  '/_authenticated/home': typeof AuthenticatedHomeRoute
   '/_authenticated/leaderboard': typeof AuthenticatedLeaderboardRoute
+  '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/_authenticated/lobby/$code': typeof AuthenticatedLobbyCodeRoute
   '/_authenticated/race/$roomId': typeof AuthenticatedRaceRoomIdRoute
   '/_authenticated/results/$roomId': typeof AuthenticatedResultsRoomIdRoute
@@ -74,15 +92,29 @@ export interface FileRoutesById {
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    '/' | '/leaderboard' | '/lobby/$code' | '/race/$roomId' | '/results/$roomId'
+    | '/'
+    | '/home'
+    | '/leaderboard'
+    | '/profile'
+    | '/lobby/$code'
+    | '/race/$roomId'
+    | '/results/$roomId'
   fileRoutesByTo: FileRoutesByTo
   to:
-    '/' | '/leaderboard' | '/lobby/$code' | '/race/$roomId' | '/results/$roomId'
+    | '/'
+    | '/home'
+    | '/leaderboard'
+    | '/profile'
+    | '/lobby/$code'
+    | '/race/$roomId'
+    | '/results/$roomId'
   id:
     | '__root__'
     | '/'
     | '/_authenticated'
+    | '/_authenticated/home'
     | '/_authenticated/leaderboard'
+    | '/_authenticated/profile'
     | '/_authenticated/lobby/$code'
     | '/_authenticated/race/$roomId'
     | '/_authenticated/results/$roomId'
@@ -109,11 +141,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/home': {
+      id: '/_authenticated/home'
+      path: '/home'
+      fullPath: '/home'
+      preLoaderRoute: typeof AuthenticatedHomeRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/leaderboard': {
       id: '/_authenticated/leaderboard'
       path: '/leaderboard'
       fullPath: '/leaderboard'
       preLoaderRoute: typeof AuthenticatedLeaderboardRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/profile': {
+      id: '/_authenticated/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof AuthenticatedProfileRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/lobby/$code': {
@@ -141,14 +187,18 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedHomeRoute: typeof AuthenticatedHomeRoute
   AuthenticatedLeaderboardRoute: typeof AuthenticatedLeaderboardRoute
+  AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
   AuthenticatedLobbyCodeRoute: typeof AuthenticatedLobbyCodeRoute
   AuthenticatedRaceRoomIdRoute: typeof AuthenticatedRaceRoomIdRoute
   AuthenticatedResultsRoomIdRoute: typeof AuthenticatedResultsRoomIdRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedHomeRoute: AuthenticatedHomeRoute,
   AuthenticatedLeaderboardRoute: AuthenticatedLeaderboardRoute,
+  AuthenticatedProfileRoute: AuthenticatedProfileRoute,
   AuthenticatedLobbyCodeRoute: AuthenticatedLobbyCodeRoute,
   AuthenticatedRaceRoomIdRoute: AuthenticatedRaceRoomIdRoute,
   AuthenticatedResultsRoomIdRoute: AuthenticatedResultsRoomIdRoute,
