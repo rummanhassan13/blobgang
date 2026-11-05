@@ -8,6 +8,7 @@ type Props = {
   animation?: BlobAnimation | undefined;
   className?: string | undefined;
   title?: string | undefined;
+  ghost?: boolean | undefined;
 };
 
 const BODY: Record<BlobType, string> = {
@@ -92,19 +93,19 @@ function Eyes({ mood, y }: { mood: BlobMood; y: number }) {
   }
 }
 
-export function Blob({ type, size = 96, mood, animation = "idle", className, title }: Props) {
+export function Blob({ type, size = 96, mood, animation = "idle", className, title, ghost }: Props) {
   const m = mood ?? BLOB_INFO[type].mood;
   const eyeY = EYE_Y[type];
   const anim = animation === "none" ? undefined : ANIMS[animation];
   return (
     <motion.div
-      style={{ width: size, height: size, transformOrigin: "50% 90%" }}
+      style={{ width: size, height: size, transformOrigin: "50% 90%", opacity: ghost ? 0.5 : 1 }}
       {...(anim ? { animate: anim.animate, transition: anim.transition } : {})}
       {...(className ? { className } : {})}
     >
       <svg viewBox="0 0 100 100" width={size} height={size} role="img" aria-label={title ?? BLOB_INFO[type].name}>
         <ellipse cx="50" cy="95" rx="30" ry="3.5" fill="var(--blob-ink)" opacity="0.1" />
-        <path d={BODY[type]} fill={`var(--blob-${type})`} />
+        <path d={BODY[type]} fill={`var(--blob-${type})`} fillOpacity={ghost ? 0.45 : 1} stroke={ghost ? "var(--blob-ink)" : "none"} strokeWidth={ghost ? 2 : 0} strokeDasharray={ghost ? "5 4" : undefined} strokeOpacity={0.6} />
         <ellipse cx={type === "snooze" ? 30 : 34} cy={type === "snooze" ? 60 : eyeY - 18} rx="8" ry="4.5" fill="var(--blob-shine)" transform={`rotate(-25 34 ${eyeY - 18})`} />
         {type === "mochi" && (
           <g fill="var(--blob-cheek)">

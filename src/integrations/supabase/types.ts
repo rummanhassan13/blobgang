@@ -101,6 +101,7 @@ export type Database = {
         Row: {
           char_index: number
           client_ts: string
+          errors: number
           id: number
           room_id: string
           server_ts: string
@@ -109,6 +110,7 @@ export type Database = {
         Insert: {
           char_index: number
           client_ts: string
+          errors?: number
           id?: number
           room_id: string
           server_ts?: string
@@ -117,6 +119,7 @@ export type Database = {
         Update: {
           char_index?: number
           client_ts?: string
+          errors?: number
           id?: number
           room_id?: string
           server_ts?: string
@@ -245,6 +248,7 @@ export type Database = {
           created_at: string
           host_id: string
           id: string
+          next_room_code: string | null
           passage_id: number | null
           starts_at: string | null
           status: Database["public"]["Enums"]["room_status"]
@@ -254,6 +258,7 @@ export type Database = {
           created_at?: string
           host_id: string
           id?: string
+          next_room_code?: string | null
           passage_id?: number | null
           starts_at?: string | null
           status?: Database["public"]["Enums"]["room_status"]
@@ -263,6 +268,7 @@ export type Database = {
           created_at?: string
           host_id?: string
           id?: string
+          next_room_code?: string | null
           passage_id?: number | null
           starts_at?: string | null
           status?: Database["public"]["Enums"]["room_status"]
@@ -270,6 +276,79 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "rooms_passage_id_fkey"
+            columns: ["passage_id"]
+            isOneToOne: false
+            referencedRelation: "passages"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      solo_checkpoints: {
+        Row: {
+          char_index: number
+          client_ts: string
+          errors: number
+          id: number
+          server_ts: string
+          solo_id: string
+          user_id: string
+        }
+        Insert: {
+          char_index: number
+          client_ts: string
+          errors?: number
+          id?: number
+          server_ts?: string
+          solo_id: string
+          user_id: string
+        }
+        Update: {
+          char_index?: number
+          client_ts?: string
+          errors?: number
+          id?: number
+          server_ts?: string
+          solo_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "solo_checkpoints_solo_id_fkey"
+            columns: ["solo_id"]
+            isOneToOne: false
+            referencedRelation: "solo_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      solo_sessions: {
+        Row: {
+          created_at: string
+          finished_at: string | null
+          id: string
+          passage_id: number
+          starts_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          finished_at?: string | null
+          id?: string
+          passage_id: number
+          starts_at: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          finished_at?: string | null
+          id?: string
+          passage_id?: number
+          starts_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "solo_sessions_passage_id_fkey"
             columns: ["passage_id"]
             isOneToOne: false
             referencedRelation: "passages"
@@ -286,6 +365,18 @@ export type Database = {
         Args: { _room_id: string }
         Returns: Database["public"]["Enums"]["room_status"]
       }
+      get_leaderboard: {
+        Args: { _limit?: number; _period: string }
+        Returns: {
+          best_wpm: number
+          blob: Database["public"]["Enums"]["blob_type"]
+          is_me: boolean
+          points: number
+          rank: number
+          user_id: string
+          username: string
+        }[]
+      }
       join_room: {
         Args: { _code: string }
         Returns: {
@@ -293,6 +384,7 @@ export type Database = {
           created_at: string
           host_id: string
           id: string
+          next_room_code: string | null
           passage_id: number | null
           starts_at: string | null
           status: Database["public"]["Enums"]["room_status"]
@@ -305,6 +397,7 @@ export type Database = {
         }
       }
       leave_room: { Args: { _room_id: string }; Returns: undefined }
+      race_again: { Args: { _room_id: string }; Returns: string }
       server_time: { Args: never; Returns: string }
       set_player_connected: {
         Args: { _connected: boolean; _room_id: string; _user_id: string }

@@ -35,3 +35,4 @@ use the editor.
 - Profiles are created by an `auth.users` trigger from signup metadata (username, blob); usernames are unique case-insensitively and pre-checked via the `username_available` RPC.
 - Race stats (wpm, accuracy, placement, points, profile totals) are written only by the `submitResult` server function using the admin client; clients have no INSERT/UPDATE on room_players/race_results and only `blob` on profiles. Room state changes go through SECURITY DEFINER RPCs (join_room, start_race, advance_room, set_player_connected).
 - Live race progress goes over a Realtime broadcast/presence channel, never DB writes; supabase-js RPC calls must be awaited or `.then()`'d or they never run.
+- Solo races use `solo_sessions` + `solo_checkpoints` and the `startSolo`/`submitSolo` server functions; both modes share `validateRun` and take accuracy from the cumulative typo count in the checkpoint trail. Typing logic lives in `useTypingEngine` for both modes.

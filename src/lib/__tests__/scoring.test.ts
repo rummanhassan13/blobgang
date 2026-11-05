@@ -32,3 +32,25 @@ describe("scoring", () => {
     expect(validateRun({ startsAt: 0, receivedAt: 20200, passageLength: 100, checkpoints: cps })).toBeNull();
   });
 });
+
+import { checkpointErrors, computeSoloPoints } from "../scoring";
+
+describe("solo + checkpoint accuracy", () => {
+  it("solo points are half of WPM x accuracy, no bonus", () => {
+    expect(computeSoloPoints(80, 100)).toBe(40);
+  });
+  it("accuracy errors come from the last checkpoint", () => {
+    expect(checkpointErrors([
+      { char_index: 10, client_ts: "", server_ts: "", errors: 1 },
+      { char_index: 20, client_ts: "", server_ts: "", errors: 4 },
+    ])).toBe(4);
+  });
+  it("rejects a checkpoint trail whose typo count decreases", () => {
+    const iso = (ms: number) => new Date(ms).toISOString();
+    const cps = [
+      { char_index: 50, client_ts: iso(10000), server_ts: iso(10000), errors: 3 },
+      { char_index: 100, client_ts: iso(20000), server_ts: iso(20000), errors: 1 },
+    ];
+    expect(validateRun({ startsAt: 0, receivedAt: 20200, passageLength: 100, checkpoints: cps })).toBe("Typo count went backwards");
+  });
+});

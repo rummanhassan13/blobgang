@@ -76,12 +76,12 @@ export function useRoomLive(roomId: string | undefined, userId: string | undefin
       .on("presence", { event: "sync" }, () => setOnline(new Set(Object.keys(live.presenceState()))))
       .on("presence", { event: "leave" }, ({ key }) => {
         if (!key || key === userId) return;
-        // Debounce: brief reconnects (navigation between lobby and race) should not mark a drop
+        // Grace period: tab switches / brief reconnects should not mark a drop
         setTimeout(() => {
           if (!(key in live.presenceState())) {
             void supabase.rpc("set_player_connected", { _room_id: roomId, _user_id: key, _connected: false }).then();
           }
-        }, 4000);
+        }, 8000);
       })
       .on("broadcast", { event: "progress" }, ({ payload }) => {
         const p = payload as ProgressMsg;
@@ -95,7 +95,14 @@ export function useRoomLive(roomId: string | undefined, userId: string | undefin
         }
       });
     channelRef.current = live;
+    const onVisible = () => {
+      if (document.visibilityState !== "visible" || !subscribed.current) return;
+      void live.track({ at: Date.now() });
+      void supabase.rpc("set_player_connected", { _room_id: roomId, _user_id: userId, _connected: true }).then();
+    };
+    document.addEventListener("visibilitychange", onVisible);
     return () => {
+      document.removeEventListener("visibilitychange", onVisible);
       subscribed.current = false;
       channelRef.current = null;
       supabase.removeChannel(db);
