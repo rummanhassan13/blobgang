@@ -1,0 +1,1 @@
+ALTER FUNCTION public.server_time() SET search_path TO 'public';
