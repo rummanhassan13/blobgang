@@ -9,6 +9,7 @@ import {
   type ErrorComponentProps,
 } from "@tanstack/react-router";
 import { useEffect, type ReactNode } from "react";
+import { MotionConfig } from "framer-motion";
 import { Toaster } from "@/components/ui/sonner";
 import { BackgroundBlobs } from "@/components/BackgroundBlobs";
 import { AppNav } from "@/components/AppNav";
@@ -103,6 +104,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "manifest", href: "/site.webmanifest" },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
+      { rel: "preload", as: "style", href: "https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Fredoka:wght@500;600;700&family=Nunito:wght@400;600;700;800&display=swap" },
       {
         rel: "stylesheet",
         href: "https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Fredoka:wght@500;600;700&family=Nunito:wght@400;600;700;800&display=swap",
@@ -145,11 +147,13 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-      <BackgroundBlobs />
-      <div className="relative flex min-h-dvh flex-col">
-        <AppNav />
-        <Outlet />
-      </div>
+      <MotionConfig reducedMotion="user">
+        <BackgroundBlobs />
+        <div className="relative flex min-h-dvh flex-col">
+          <AppNav />
+          <Outlet />
+        </div>
+      </MotionConfig>
       <Toaster position="top-center" />
     </QueryClientProvider>
   );
