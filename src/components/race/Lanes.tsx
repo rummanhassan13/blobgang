@@ -39,14 +39,18 @@ export function Splash() {
   );
 }
 
-export function Lanes({ racers, size = 52 }: { racers: LaneRacer[]; size?: number }) {
+export function Lanes({ racers, size: sizeProp, compact }: { racers: LaneRacer[]; size?: number; compact?: boolean }) {
+  // Shrink lanes as the field grows (up to 8 players) or when space is tight (keyboard open)
+  const tight = compact || racers.length > 4;
+  const size = sizeProp ?? (compact ? (racers.length > 4 ? 26 : 34) : racers.length > 6 ? 34 : racers.length > 4 ? 40 : 52);
+  const laneH = size + (tight ? 18 : 24);
   return (
-    <div className="glass space-y-1 rounded-[2rem] px-4 py-4 sm:px-6">
+    <div className={cn("glass rounded-[2rem]", tight ? "space-y-0 px-3 py-2 sm:px-6" : "space-y-1 px-4 py-4 sm:px-6")}>
       {racers.map((r, i) => {
         const type = isBlobType(r.blob) ? r.blob : "bubbles";
         const anim: BlobAnimation = !r.connected ? "idle" : r.finished ? "happy" : r.pulse?.anim ?? (r.progress > 0 ? "squash" : "idle");
         return (
-          <div key={r.userId} className={cn("relative h-[76px] transition-opacity", !r.connected && "opacity-45 grayscale")}>
+          <div key={r.userId} style={{ height: laneH }} className={cn("relative transition-opacity", !r.connected && "opacity-45 grayscale")}>
             <svg className="absolute inset-x-0 bottom-3 h-5 w-full overflow-visible" viewBox="0 0 200 20" preserveAspectRatio="none" aria-hidden>
               <motion.path
                 d={WAVE_A}
@@ -80,8 +84,8 @@ export function Lanes({ racers, size = 52 }: { racers: LaneRacer[]; size?: numbe
                 <AnimatePresence>{r.finished && !r.ghost && <Splash key="splash" />}</AnimatePresence>
               </div>
             </motion.div>
-            <div className="absolute left-0 top-0 flex items-center gap-1.5 text-xs font-semibold text-muted-foreground">
-              <span className={cn(r.isMe && "text-foreground")}>{r.username}{r.isMe && " (you)"}</span>
+            <div className="absolute left-0 top-0 flex min-w-0 items-center gap-1.5 text-xs font-semibold text-muted-foreground max-w-[70%] truncate">
+              <span className={cn("truncate", r.isMe && "text-foreground")}>{r.username}{r.isMe && " (you)"}</span>
               {!r.connected && <span className="rounded-full bg-muted px-2 py-0.5">disconnected</span>}
               {r.placement != null && <span className="rounded-full bg-accent px-2 py-0.5 text-accent-foreground">#{r.placement}</span>}
             </div>
