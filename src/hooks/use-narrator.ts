@@ -1,9 +1,9 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { chunkText, getNarrator, onNarratorChange, speak, stopSpeech, type NarratorSettings } from "@/lib/narrator";
+import { DEFAULT_RATE, chunkText, getNarrator, onNarratorChange, speak, stopSpeech, type NarratorSettings } from "@/lib/narrator";
 import { isMuted } from "@/lib/sfx";
 
 export function useNarratorSettings() {
-  const [s, setS] = useState<NarratorSettings>({ enabled: false, rate: 1 });
+  const [s, setS] = useState<NarratorSettings>(() => ({ enabled: false, rate: DEFAULT_RATE }));
   useEffect(() => { setS(getNarrator()); return onNarratorChange(setS); }, []);
   return s;
 }
@@ -26,7 +26,7 @@ export function useNarrator(text: string, index: number, active: boolean, blob: 
     if (spoken.current < 0 && cur > 0) spoken.current = cur - 1; // resumed mid-race
     // speak current chunk, plus queue the next when past half of current
     const c = chunks[cur]!;
-    const target = index - c.start > c.text.length / 2 ? Math.min(cur + 1, chunks.length - 1) : cur;
+    const target = index - c.start > c.text.length * 0.8 ? Math.min(cur + 1, chunks.length - 1) : cur;
     while (spoken.current < target) { spoken.current += 1; speak(chunks[spoken.current]!.text, blob, rate); }
   }, [active, enabled, index, chunks, blob, rate]);
 }
