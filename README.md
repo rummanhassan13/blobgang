@@ -1,56 +1,49 @@
-# Blobgang
+# Blob Gang
 
-Create "Blob Gang": a funky, bubbly but minimalist multiplayer typing race web app (React + TypeScript + Tailwind + Framer Motion). Players race as squishy jelly blob characters instead of cars. The typing text must stay clean and highly readable; the blobs are the heroes. Use Lovable Cloud (Supabase) for auth, realtime and storage.
+A multiplayer typing race in the browser. Players race as squishy jelly blob characters, and the passage text stays clean and readable while the blobs do the moving.
 
-STEP 1 (this message): foundation, look and feel, blobs, auth, database.
+**Live app:** https://blobgang.lovable.app
 
-LOOK AND FEEL
-- Soft off-white background with 2-3 huge blurred pastel colour blobs slowly morphing (Framer Motion / CSS, GPU-friendly, behind everything).
-- Fonts: Fredoka or Nunito for UI, a clean readable font (e.g. Inter or Atkinson Hyperlegible) for passage text.
-- Pill-shaped buttons, rounded corners everywhere, springy hover states. Mobile responsive, keyboard-first on desktop.
-- Design tokens in index.css / tailwind config, pastel palette.
+## Features
 
-BLOBS: 6 ORIGINAL blobs as reusable SVG React components (<Blob type size mood />) with simple dot eyes, no copyrighted characters:
-1. Zippy: lime green teardrop
-2. Snooze: lavender pancake (sleepy flat eyes)
-3. Grumbo: red square-ish grump (grumpy brows)
-4. Bubbles: pink sphere
-5. Captain Gloop: blue blob with a little sailor hat
-6. Mochi: peach blob with rosy cheeks
-Support idle wobble, squash and stretch, jiggle, shake and happy-wobble animation variants via Framer Motion.
+- Create a race room and share its code, or join a friend's room by code
+- Live race progress between players over a Supabase Realtime channel
+- Solo mode with a ghost of a previous run to race against
+- Six original blob characters (Zippy, Snooze, Grumbo, Bubbles, Captain Gloop, Mochi) drawn as one reusable SVG component with mood and animation variants
+- Email sign-up with a unique username and a blob picker, profiles with totals and best WPM
+- Results and leaderboard pages
+- Optional narrator and sound effects with a control to turn them off
 
-AUTH + PROFILES
-- Email sign-up and login. Sign-up asks for username (unique) and chosen blob via a blob picker grid.
-- profiles table (id references auth.users, username unique, blob, total_points, best_wpm, races_played, created_at) with trigger to create profile on sign-up, RLS so anyone authenticated can read profiles and users can only edit their own.
+## How results are kept honest
 
-DATABASE (with RLS)
-- passages (id, text, difficulty, length) seeded with 50 short original passages of varied length (roughly 15 to 60 words), clean ASCII punctuation.
-- rooms (id, code, host_id, passage_id, status: lobby|countdown|racing|finished, starts_at, created_at)
-- room_players (room_id, user_id, blob, username, progress, wpm, accuracy, finished_at, placement)
-- race_results (id, user_id, room_id nullable, mode solo|multi, passage_id, wpm, accuracy, points, created_at)
-- ghost_runs (user_id, passage_id, keystroke timeline json, wpm) for solo ghosts.
+Race stats are computed on the server, not trusted from the browser. Placement, points, result rows and profile totals are written by server-side SQL functions, and clients cannot write results or room state directly. Typing input accepts one character per insertion, so pasted or bulk-inserted text is rejected.
 
-Pages (stubs fine for now): Landing, Auth, Home (create room, join by code, solo), Lobby, Race, Results, Leaderboard, Profile. Make the landing page lovely with blobs bouncing around. Build it cleanly and tell me what you did; I'll send follow-up steps for rooms, realtime race, solo ghost, results and leaderboard.
+## Tech stack
 
-This project was built with [Lovable](https://lovable.dev).
+React, TypeScript, TanStack Start and Router, Tailwind CSS, Framer Motion, Supabase (auth, Postgres with row-level security, Realtime), Vite, Vitest.
 
-**Live app**: https://blobgang.lovable.app
-
-## Build with Lovable
-
-Continue developing this project in the [Lovable editor](https://lovable.dev/projects/f715cb09-df9b-4f7d-a0d6-3f399740ec54).
-
-- **Ship faster**: describe what you want to build and Lovable handles the code.
-- **Stay in sync**: every change made in Lovable is committed straight to this repository.
-- **Full ownership**: this code is yours. Push to `main` on GitHub and your changes sync back into Lovable, ready for your next prompt.
-
-## Development
-
-Prefer working locally? You need Node.js and npm — [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating).
+## Running locally
 
 ```sh
-git clone <this-repository-url>
-cd <repository-name>
-npm i
+npm install
 npm run dev
 ```
+
+Other scripts: `npm run build`, `npm test`, `npm run lint`.
+
+The committed `.env` contains only the project's public Supabase URL and publishable key, so a local run connects to the hosted backend. To run in isolation, point those values at your own Supabase project. Never commit service-role keys.
+
+## Project notes
+
+- `src/components/blob/Blob.tsx` is the blob character component; colours come from CSS tokens.
+- `src/routes/` holds the file-based routes; signed-in pages live under `_authenticated/`.
+- `src/lib/scoring.ts` has the WPM and accuracy calculations, with tests.
+- `AGENTS.md` records the project's design rules.
+
+## Status and license
+
+Live and actively changing. Unit tests exist for scoring, routing and password recovery; they are run with `npm test`. No license has been specified yet.
+
+## Built with
+
+Built with AI assistance using [Lovable](https://lovable.dev) and edited by Rumman Hassan. Changes made in the Lovable editor are committed to this repository. Author: [Rumman Hassan](https://github.com/rummanhassan13) · [rummanhassan.cv](https://rummanhassan.cv)
